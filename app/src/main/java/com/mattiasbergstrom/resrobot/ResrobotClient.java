@@ -1,6 +1,9 @@
 package com.mattiasbergstrom.resrobot;
 
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 
 import com.mattiasbergstrom.resrobot.DownloadTask.DownloadCompleteCallback;
 
@@ -15,508 +18,524 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ResrobotClient {
 
-	public enum CoordSys {
-		WGS84, RT90
-	}
+    public enum CoordSys {
+        WGS84, RT90
+    }
 
-	private String key = "";
-	private String departuresKey = "";
-	private CoordSys coordSys = CoordSys.WGS84;
-	private boolean isSuper = false;
-	private String apiVersion = "2.1";
-	private SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd",
-			Locale.getDefault());
-	private SimpleDateFormat timeFormater = new SimpleDateFormat("HH:mm",
-			Locale.getDefault());
+    private String key = "";
+    private String departuresKey = "";
+    private CoordSys coordSys = CoordSys.WGS84;
+    private boolean isSuper = false;
+    private String apiVersion = "2.1";
+    private SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd",
+            Locale.getDefault());
+    private SimpleDateFormat timeFormater = new SimpleDateFormat("HH:mm",
+            Locale.getDefault());
+    private boolean mMultiThreaded = false;
+    private int mConcurrentThreadLimit = 4;
 
-	public ResrobotClient(String key) {
-		this(key, "");
-	}
-	
-	public ResrobotClient(String key, String departuresKey) {
-		this.key = key;
-		this.departuresKey = departuresKey;
-	}
+    private List<DownloadQueueTask> mDownloadTaskQueue;
+    private List<DownloadQueueTask> mOpenDownloadTasks;
+    private int openTasks = 0;
 
-	/* Interfaces */
-	public interface SearchCallback {
-		public void searchComplete(ArrayList<Route> result);
-	}
+    public ResrobotClient(String key) {
+        this(key, "");
+    }
 
-	public interface FindLocationCallback {
-		public void findLocationComplete(ArrayList<Location> fromResult,
-				ArrayList<Location> toResult);
-	}
+    public ResrobotClient(String key, String departuresKey) {
+        this.key = key;
+        this.departuresKey = departuresKey;
+        this.mDownloadTaskQueue = new ArrayList<DownloadQueueTask>();
+        this.mOpenDownloadTasks = new ArrayList<DownloadQueueTask>();
+    }
 
-	public interface StationsInZoneCallback {
-		public void stationsInZoneComplete(ArrayList<Location> result);
-	}
+    /* Interfaces */
+    public interface SearchCallback {
+        public void searchComplete(ArrayList<Route> result);
+    }
 
-	public interface ErrorCallback {
-		public void errorOccurred();
-	}
-	
-	public interface DeparturesCallback {
-		public void departuresComplete(ArrayList<RouteSegment> result);
-	}
+    public interface FindLocationCallback {
+        public void findLocationComplete(ArrayList<Location> fromResult,
+                                         ArrayList<Location> toResult);
+    }
+
+    public interface StationsInZoneCallback {
+        public void stationsInZoneComplete(ArrayList<Location> result);
+    }
+
+    public interface ErrorCallback {
+        public void errorOccurred();
+    }
+
+    public interface DeparturesCallback {
+        public void departuresComplete(ArrayList<RouteSegment> result);
+    }
 
 	/* Private methods */
 
-	private String getUrl() {
-		if (isSuper)
-			return "https://api.trafiklab.se/samtrafiken/resrobotsuper";
-		else
-			return "https://api.trafiklab.se/samtrafiken/resrobot";
-	}
-	
-	private String getDeparturesUrl() {
-		if(isSuper) {
-			return "https://api.trafiklab.se/samtrafiken/resrobotstops";
-		} else {
-			return "https://api.trafiklab.se/samtrafiken/resrobotstopssuper";
-		}
-	}
+    private String getUrl() {
+        if (isSuper)
+            return "https://api.trafiklab.se/samtrafiken/resrobotsuper";
+        else
+            return "https://api.trafiklab.se/samtrafiken/resrobot";
+    }
+
+    private String getDeparturesUrl() {
+        if(isSuper) {
+            return "https://api.trafiklab.se/samtrafiken/resrobotstops";
+        } else {
+            return "https://api.trafiklab.se/samtrafiken/resrobotstopssuper";
+        }
+    }
 
 	/* Public methods */
 
-	public void findLocation(String from, String to,
-			final FindLocationCallback callback) {
-		findLocation(from, to, callback, null);
-	}
+    public void findLocation(String from, String to,
+                             final FindLocationCallback callback) {
+        findLocation(from, to, callback, null);
+    }
 
-	public void findLocation(String from, String to,
-			final FindLocationCallback callback,
-			final ErrorCallback errorCallback) {
-		
-		try {
-			URL url;
-			url = new URL(getUrl() + "/FindLocation.json?key=" + this.key
-						+ "&from=" + URLEncoder.encode(from, "UTF-8") + "&to=" + URLEncoder.encode(to, "UTF-8") + "&coordSys="
-						+ coordSys.toString() + "&apiVersion=" + apiVersion);
+    public void findLocation(String from, String to,
+                             final FindLocationCallback callback,
+                             final ErrorCallback errorCallback) {
 
-			findLocation(url, callback, errorCallback);
-		} catch (MalformedURLException e) {
-			if (errorCallback != null) {
-				errorCallback.errorOccurred();
-			}
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			if (errorCallback != null) {
-				errorCallback.errorOccurred();
-			}
-			e.printStackTrace();
-		}
-	}
+        try {
+            URL url;
+            url = new URL(getUrl() + "/FindLocation.json?key=" + this.key
+                    + "&from=" + URLEncoder.encode(from, "UTF-8") + "&to=" + URLEncoder.encode(to, "UTF-8") + "&coordSys="
+                    + coordSys.toString() + "&apiVersion=" + apiVersion);
 
-	public void findLocation(URL url, final FindLocationCallback callback) {
-		findLocation(url, callback, null);
-	}
+            findLocation(url, callback, errorCallback);
+        } catch (MalformedURLException e) {
+            if (errorCallback != null) {
+                errorCallback.errorOccurred();
+            }
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            if (errorCallback != null) {
+                errorCallback.errorOccurred();
+            }
+            e.printStackTrace();
+        }
+    }
 
-	public void findLocation(URL url, final FindLocationCallback callback,
-			final ErrorCallback errorCallback) {
-		DownloadTask task = new DownloadTask();
-		final Handler handler = new Handler();
-		task.setDownloadCompleteCallback(new DownloadCompleteCallback() {
+    public void findLocation(URL url, final FindLocationCallback callback) {
+        findLocation(url, callback, null);
+    }
 
-			@Override
-			public void downloadComplete(String result) {
+    public void findLocation(URL url, final FindLocationCallback callback,
+                             final ErrorCallback errorCallback) {
+        final DownloadTask task = new DownloadTask();
+        final Handler handler = new Handler();
+        task.setDownloadCompleteCallback(new DownloadCompleteCallback() {
 
-				if (result == null) {
-					if (errorCallback != null) {
-						handler.post(new Runnable() {
+            @Override
+            public void downloadComplete(String result) {
 
-							@Override
-							public void run() {
-								errorCallback.errorOccurred();
-							}
-						});
-					}
-					return;
-				}
+                if (result == null) {
+                    if (errorCallback != null) {
+                        handler.post(new Runnable() {
 
-				final ArrayList<Location> fromLocations = new ArrayList<Location>();
-				final ArrayList<Location> toLocations = new ArrayList<Location>();
+                            @Override
+                            public void run() {
+                                errorCallback.errorOccurred();
+                            }
+                        });
+                    }
+                    return;
+                }
 
-				try {
-					JSONObject jObject = (new JSONObject(result)
-							.getJSONObject("findlocationresult"));
+                final ArrayList<Location> fromLocations = new ArrayList<Location>();
+                final ArrayList<Location> toLocations = new ArrayList<Location>();
 
-					if (jObject.has("from")) {
+                try {
+                    JSONObject jObject = (new JSONObject(result)
+                            .getJSONObject("findlocationresult"));
 
-						JSONArray fromLocationArr = jObject.optJSONObject(
-								"from").optJSONArray("location");
+                    if (jObject.has("from")) {
 
-						if(fromLocationArr != null) {
-							for (int i = 0; i < fromLocationArr.length(); i++) {
-								Location loc = new Location(fromLocationArr
-										.getJSONObject(i));
-								fromLocations.add(loc);
-							}
-						}
-					}
+                        JSONArray fromLocationArr = jObject.optJSONObject(
+                                "from").optJSONArray("location");
 
-					if (jObject.has("to")) {
+                        if(fromLocationArr != null) {
+                            for (int i = 0; i < fromLocationArr.length(); i++) {
+                                Location loc = new Location(fromLocationArr
+                                        .getJSONObject(i));
+                                fromLocations.add(loc);
+                            }
+                        }
+                    }
 
-						JSONArray toLocationArr = jObject.optJSONObject("to")
-								.optJSONArray("location");
+                    if (jObject.has("to")) {
 
-						if(toLocationArr != null) {
-							for (int i = 0; i < toLocationArr.length(); i++) {
-								Location loc = new Location(toLocationArr
-										.getJSONObject(i));
-								toLocations.add(loc);
-							}
-						}
-					}
+                        JSONArray toLocationArr = jObject.optJSONObject("to")
+                                .optJSONArray("location");
 
-					handler.post(new Runnable() {
+                        if(toLocationArr != null) {
+                            for (int i = 0; i < toLocationArr.length(); i++) {
+                                Location loc = new Location(toLocationArr
+                                        .getJSONObject(i));
+                                toLocations.add(loc);
+                            }
+                        }
+                    }
 
-						@Override
-						public void run() {
-							callback.findLocationComplete(fromLocations,
-									toLocations);
-						}
-					});
-				} catch (JSONException e) {
-					if (errorCallback != null) {
-						handler.post(new Runnable() {
+                    handler.post(new Runnable() {
 
-							@Override
-							public void run() {
-								errorCallback.errorOccurred();
-							}
-						});
-					}
-					e.printStackTrace();
-				}
-			}
-		});
+                        @Override
+                        public void run() {
+                            callback.findLocationComplete(fromLocations,
+                                    toLocations);
+                        }
+                    });
+                } catch (JSONException e) {
+                    if (errorCallback != null) {
+                        handler.post(new Runnable() {
 
-		task.execute(url);
-	}
+                            @Override
+                            public void run() {
+                                errorCallback.errorOccurred();
+                            }
+                        });
+                    }
+                    e.printStackTrace();
+                }
+                if(getIsMultiThreaded()){
+                    QueuedDownloadTaskComplete(task);
+                }
+            }
+        });
+        this.executeDownloadTask(task, null);
+    }
 
-	public void search(String fromId, String toId, Date date, boolean arrival,
-			final SearchCallback callback) {
-		search(fromId, toId, date, arrival, callback, null);
-	}
+    public void search(String fromId, String toId, Date date, boolean arrival,
+                       final SearchCallback callback) {
+        search(fromId, toId, date, arrival, callback, null);
+    }
 
-	/**
-	 * Searches for routes
-	 * 
-	 * @param fromId
-	 *            the id to travel from
-	 * @param toId
-	 *            the id to travel to
-	 * @param date
-	 *            the date/time to search on
-	 * @param arrival
-	 *            set to 'true' if the time specified is the wanted arrival time
-	 * @param callback
-	 *            gets called when the search is done
-	 */
-	public void search(String fromId, String toId, Date date, boolean arrival,
-			final SearchCallback callback, final ErrorCallback errorCallback) {
-		String urlString = getUrl() + "/Search.json?key=" + this.key
-				+ "&fromId=" + fromId + "&toId=" + toId + "&arrival=" + arrival
-				+ "&coordSys=" + coordSys.toString();
+    /**
+     * Searches for routes
+     *
+     * @param fromId
+     *            the id to travel from
+     * @param toId
+     *            the id to travel to
+     * @param date
+     *            the date/time to search on
+     * @param arrival
+     *            set to 'true' if the time specified is the wanted arrival time
+     * @param callback
+     *            gets called when the search is done
+     */
+    public void search(String fromId, String toId, Date date, boolean arrival,
+                       final SearchCallback callback, final ErrorCallback errorCallback) {
+        String urlString = getUrl() + "/Search.json?key=" + this.key
+                + "&fromId=" + fromId + "&toId=" + toId + "&arrival=" + arrival
+                + "&coordSys=" + coordSys.toString();
 
-		urlString += "&date=" + dateFormater.format(date);
-		urlString += "&time=" + timeFormater.format(date);
+        urlString += "&date=" + dateFormater.format(date);
+        urlString += "&time=" + timeFormater.format(date);
 
-		urlString += "&apiVersion=" + apiVersion;
-		try {
-			search(new URL(urlString), callback, errorCallback);
+        urlString += "&apiVersion=" + apiVersion;
+        try {
+            search(new URL(urlString), callback, errorCallback);
 
-		} catch (MalformedURLException e) {
-			if (errorCallback != null) {
-				errorCallback.errorOccurred();
-			}
-			e.printStackTrace();
-		}
-	}
+        } catch (MalformedURLException e) {
+            if (errorCallback != null) {
+                errorCallback.errorOccurred();
+            }
+            e.printStackTrace();
+        }
+    }
 
-	public void search(String from, String to, double fromX, double fromY,
-			double toX, double toY, Date date, boolean arrival,
-			SearchCallback callback) {
-		search(from, to, fromX, fromY, toX, toY, date, arrival, callback, null);
-	}
+    public void search(String from, String to, double fromX, double fromY,
+                       double toX, double toY, Date date, boolean arrival,
+                       SearchCallback callback) {
+        search(from, to, fromX, fromY, toX, toY, date, arrival, callback, null);
+    }
 
-	public void search(String from, String to, double fromX, double fromY,
-			double toX, double toY, Date date, boolean arrival,
-			SearchCallback callback, final ErrorCallback errorCallback) {
-		String urlString = getUrl() + "/Search.json?key=" + this.key + "&from="
-				+ from + "&to=" + to + "&fromX=" + fromX + "&fromY=" + fromY
-				+ "&toX=" + toX + "&toY=" + toY + "&arrival=" + arrival
-				+ "&coordSys=" + coordSys.toString();
+    public void search(String from, String to, double fromX, double fromY,
+                       double toX, double toY, Date date, boolean arrival,
+                       SearchCallback callback, final ErrorCallback errorCallback) {
+        String urlString = getUrl() + "/Search.json?key=" + this.key + "&from="
+                + from + "&to=" + to + "&fromX=" + fromX + "&fromY=" + fromY
+                + "&toX=" + toX + "&toY=" + toY + "&arrival=" + arrival
+                + "&coordSys=" + coordSys.toString();
 
-		if (date != null) {
-			urlString += "&date=" + dateFormater.format(date);
-			urlString += "&time=" + timeFormater.format(date);
-		}
+        if (date != null) {
+            urlString += "&date=" + dateFormater.format(date);
+            urlString += "&time=" + timeFormater.format(date);
+        }
 
-		urlString += "&apiVersion=" + apiVersion;
+        urlString += "&apiVersion=" + apiVersion;
 
-		try {
-			search(new URL(urlString), callback, errorCallback);
-		} catch (MalformedURLException e) {
-			if (errorCallback != null) {
-				errorCallback.errorOccurred();
-			}
-			e.printStackTrace();
-		}
-	}
+        try {
+            search(new URL(urlString), callback, errorCallback);
+        } catch (MalformedURLException e) {
+            if (errorCallback != null) {
+                errorCallback.errorOccurred();
+            }
+            e.printStackTrace();
+        }
+    }
 
-	public void search(URL url, final SearchCallback callback) {
-		search(url, callback, null);
-	}
+    public void search(URL url, final SearchCallback callback) {
+        search(url, callback, null);
+    }
 
-	public void search(URL url, final SearchCallback callback,
-			final ErrorCallback errorCallback) {
-		DownloadTask task = new DownloadTask();
-		final Handler handler = new Handler();
-		task.setDownloadCompleteCallback(new DownloadCompleteCallback() {
+    public void search(URL url, final SearchCallback callback,
+                       final ErrorCallback errorCallback) {
+        final DownloadTask task = new DownloadTask();
+        final Handler handler = new Handler();
+        task.setDownloadCompleteCallback(new DownloadCompleteCallback() {
 
-			@Override
-			public void downloadComplete(String result) {
+            @Override
+            public void downloadComplete(String result) {
 
-				if (result == null) {
-					if (errorCallback != null) {
-						handler.post(new Runnable() {
-							
-							@Override
-							public void run() {
-								errorCallback.errorOccurred();
-							}
-						});
-					}
-					return;
-				}
+                if (result == null) {
+                    if (errorCallback != null) {
+                        handler.post(new Runnable() {
 
-				final ArrayList<Route> routes = new ArrayList<Route>();
+                            @Override
+                            public void run() {
+                                errorCallback.errorOccurred();
+                            }
+                        });
+                    }
+                    return;
+                }
 
-				JSONObject jObject;
-				try {
-					jObject = new JSONObject(result);
-					jObject = jObject.getJSONObject("timetableresult");
+                final ArrayList<Route> routes = new ArrayList<Route>();
 
-					if (!jObject.has("ttitem")) { // return empty result list
-													// instead of crashing
-						handler.post(new Runnable() {
-							
-							@Override
-							public void run() {
-								callback.searchComplete(routes);
-							}
-						});
-						return;
-					}
+                JSONObject jObject;
+                try {
+                    jObject = new JSONObject(result);
+                    jObject = jObject.getJSONObject("timetableresult");
 
-					JSONArray ttitems = jObject.getJSONArray("ttitem");
+                    if (!jObject.has("ttitem")) { // return empty result list
+                        // instead of crashing
+                        handler.post(new Runnable() {
 
-					for (int i = 0; i < ttitems.length(); i++) {
-						Route route = new Route();
-						// The API doesn't put the segment in an array if
-						// there's only one
-						// segment within the ttitem. So a check must be made
-						JSONArray arr = ttitems.getJSONObject(i).optJSONArray(
-								"segment");
-						if (arr != null) {
-							for (int j = 0; j < arr.length(); j++) {
-								RouteSegment segment;
-								segment = new RouteSegment(arr.getJSONObject(j));
-								route.addSegment(segment);
-							}
-						} else {
-							JSONObject obj = ttitems.getJSONObject(i)
-									.getJSONObject("segment");
-							RouteSegment segment;
-							segment = new RouteSegment(obj);
-							route.addSegment(segment);
-						}
+                            @Override
+                            public void run() {
+                                callback.searchComplete(routes);
+                            }
+                        });
+                        return;
+                    }
 
-						routes.add(route);
-					}
+                    JSONArray ttitems = jObject.getJSONArray("ttitem");
 
-					handler.post(new Runnable() {
-						
-						@Override
-						public void run() {
-							callback.searchComplete(routes);
-						}
-					});
+                    for (int i = 0; i < ttitems.length(); i++) {
+                        Route route = new Route();
+                        // The API doesn't put the segment in an array if
+                        // there's only one
+                        // segment within the ttitem. So a check must be made
+                        JSONArray arr = ttitems.getJSONObject(i).optJSONArray(
+                                "segment");
+                        if (arr != null) {
+                            for (int j = 0; j < arr.length(); j++) {
+                                RouteSegment segment;
+                                segment = new RouteSegment(arr.getJSONObject(j));
+                                route.addSegment(segment);
+                            }
+                        } else {
+                            JSONObject obj = ttitems.getJSONObject(i)
+                                    .getJSONObject("segment");
+                            RouteSegment segment;
+                            segment = new RouteSegment(obj);
+                            route.addSegment(segment);
+                        }
 
-				} catch (JSONException e) {
-					if (errorCallback != null) {
-						handler.post(new Runnable() {
-							
-							@Override
-							public void run() {
-								errorCallback.errorOccurred();
-							}
-						});
-					}
-					e.printStackTrace();
-				}
-			}
-		});
+                        routes.add(route);
+                    }
 
-		task.execute(url);
-	}
+                    handler.post(new Runnable() {
 
-	public void stationsInZone(double centerX, double centerY, int radius,
-			final StationsInZoneCallback callback) {
-		stationsInZone(centerX, centerY, radius, callback, null);
-	}
+                        @Override
+                        public void run() {
+                            callback.searchComplete(routes);
+                        }
+                    });
 
-	public void stationsInZone(double centerX, double centerY, int radius,
-			final StationsInZoneCallback callback,
-			final ErrorCallback errorCallback) {
-		URL url;
-		try {
-			url = new URL(getUrl() + "/StationsInZone.json?key=" + this.key
-					+ "&centerX=" + centerX + "&centerY=" + centerY
-					+ "&radius=" + radius + "&coordSys=" + coordSys.toString());
-			DownloadTask task = new DownloadTask();
-			final Handler handler = new Handler();
-			task.setDownloadCompleteCallback(new DownloadCompleteCallback() {
+                } catch (JSONException e) {
+                    if (errorCallback != null) {
+                        handler.post(new Runnable() {
 
-				@Override
-				public void downloadComplete(String result) {
+                            @Override
+                            public void run() {
+                                errorCallback.errorOccurred();
+                            }
+                        });
+                    }
+                    e.printStackTrace();
+                }
+                if(getIsMultiThreaded()){
+                    QueuedDownloadTaskComplete(task);
+                }
+            }
+        });
 
-					if (result == null) {
-						if (errorCallback != null) {
-							handler.post(new Runnable() {
-								
-								@Override
-								public void run() {
-									errorCallback.errorOccurred();
-								}
-							});
-						}
-						return;
-					}
+        this.executeDownloadTask(task, url);
+    }
 
-					final ArrayList<Location> locations = new ArrayList<Location>();
-					JSONObject jObject;
-					try {
-						jObject = new JSONObject(result);
-						jObject = jObject.getJSONObject("stationsinzoneresult");
+    public void stationsInZone(double centerX, double centerY, int radius,
+                               final StationsInZoneCallback callback) {
+        stationsInZone(centerX, centerY, radius, callback, null);
+    }
 
-						if (!jObject.has("location")) { // return empty result
-														// list instead of
-														// crashing
-							handler.post(new Runnable() {
-								
-								@Override
-								public void run() {
-									callback.stationsInZoneComplete(locations);
-								}
-							});
-							return;
-						}
+    public void stationsInZone(double centerX, double centerY, int radius,
+                               final StationsInZoneCallback callback,
+                               final ErrorCallback errorCallback) {
+        URL url;
+        try {
+            url = new URL(getUrl() + "/StationsInZone.json?key=" + this.key
+                    + "&centerX=" + centerX + "&centerY=" + centerY
+                    + "&radius=" + radius + "&coordSys=" + coordSys.toString());
+            final DownloadTask task = new DownloadTask();
+            final Handler handler = new Handler();
+            task.setDownloadCompleteCallback(new DownloadCompleteCallback() {
 
-						JSONArray arr = jObject.getJSONArray("location");
-						if (arr != null) {
-							for (int i = 0; i < arr.length(); i++) {
-								Location loc = new Location(arr
-										.getJSONObject(i));
-								locations.add(loc);
-							}
-						} else {
-							JSONObject obj = jObject.getJSONObject("location");
-							Location loc = new Location(obj);
-							locations.add(loc);
-						}
+                @Override
+                public void downloadComplete(String result) {
 
-						handler.post(new Runnable() {
-							
-							@Override
-							public void run() {
-								callback.stationsInZoneComplete(locations);
-							}
-						});
-					} catch (JSONException e) {
-						if (errorCallback != null) {
+                    if (result == null) {
+                        if (errorCallback != null) {
+                            handler.post(new Runnable() {
 
-							handler.post(new Runnable() {
-								
-								@Override
-								public void run() {
-									errorCallback.errorOccurred();
-								}
-							});
-						}
-						e.printStackTrace();
-					}
-				}
-			});
+                                @Override
+                                public void run() {
+                                    errorCallback.errorOccurred();
+                                }
+                            });
+                        }
+                        return;
+                    }
 
-			task.execute(url);
-		} catch (MalformedURLException e) {
-			if (errorCallback != null) {
-				errorCallback.errorOccurred();
-			}
-			e.printStackTrace();
-		}
-	}
-	
-	public void departures(int locationId, int timeSpan,
-			final DeparturesCallback callback) {
-		departures(locationId, timeSpan, callback, null);
-	}
-	
-	public void departures(int locationId, int timeSpan,
-			final DeparturesCallback callback,
-			final ErrorCallback errorCallback) {
-		URL url;
-		try {
-			url = new URL(getDeparturesUrl() + "/GetDepartures.json?key=" + this.departuresKey
-					+ "&locationId=" + String.valueOf(locationId) + "&apiVersion=2.2"
-					+ "&timeSpan=" + timeSpan + "&coordSys=" + coordSys.toString());
-			
-			DownloadTask task = new DownloadTask();
-			final Handler handler = new Handler();
-			
-			task.setDownloadCompleteCallback(new DownloadCompleteCallback() {
+                    final ArrayList<Location> locations = new ArrayList<Location>();
+                    JSONObject jObject;
+                    try {
+                        jObject = new JSONObject(result);
+                        jObject = jObject.getJSONObject("stationsinzoneresult");
 
-				@Override
-				public void downloadComplete(String result) {
+                        if (!jObject.has("location")) { // return empty result
+                            // list instead of
+                            // crashing
+                            handler.post(new Runnable() {
 
-					if (result == null) {
-						if (errorCallback != null) {
-							handler.post(new Runnable() {
-								
-								@Override
-								public void run() {
-									errorCallback.errorOccurred();
-								}
-							});
-						}
-						return;
-					}
+                                @Override
+                                public void run() {
+                                    callback.stationsInZoneComplete(locations);
+                                }
+                            });
+                            return;
+                        }
 
-					final ArrayList<RouteSegment> departures = new ArrayList<RouteSegment>();
-					JSONObject jObject;
-					try {
-						jObject = new JSONObject(result);
-						jObject = jObject.getJSONObject("getdeparturesresult");
+                        JSONArray arr = jObject.getJSONArray("location");
+                        if (arr != null) {
+                            for (int i = 0; i < arr.length(); i++) {
+                                Location loc = new Location(arr
+                                        .getJSONObject(i));
+                                locations.add(loc);
+                            }
+                        } else {
+                            JSONObject obj = jObject.getJSONObject("location");
+                            Location loc = new Location(obj);
+                            locations.add(loc);
+                        }
 
-						if (!jObject.has("departuresegment")) { // return empty result
-														// list instead of
-														// crashing
-							handler.post(new Runnable() {
-								
-								@Override
-								public void run() {
-									callback.departuresComplete(departures);
-								}
-							});
-							return;
-						}
+                        handler.post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                callback.stationsInZoneComplete(locations);
+                            }
+                        });
+                    } catch (JSONException e) {
+                        if (errorCallback != null) {
+
+                            handler.post(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    errorCallback.errorOccurred();
+                                }
+                            });
+                        }
+                        e.printStackTrace();
+                    }
+                    if(getIsMultiThreaded()){
+                        QueuedDownloadTaskComplete(task);
+                    }
+                }
+            });
+            this.executeDownloadTask(task, url);
+        } catch (MalformedURLException e) {
+            if (errorCallback != null) {
+                errorCallback.errorOccurred();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    public void departures(int locationId, int timeSpan,
+                           final DeparturesCallback callback) {
+        departures(locationId, timeSpan, callback, null);
+    }
+
+    public void departures(int locationId, int timeSpan,
+                           final DeparturesCallback callback,
+                           final ErrorCallback errorCallback) {
+        URL url;
+        try {
+            url = new URL(getDeparturesUrl() + "/GetDepartures.json?key=" + this.departuresKey
+                    + "&locationId=" + String.valueOf(locationId) + "&apiVersion=2.2"
+                    + "&timeSpan=" + timeSpan + "&coordSys=" + coordSys.toString());
+
+            final DownloadTask task = new DownloadTask();
+            final Handler handler = new Handler();
+
+            task.setDownloadCompleteCallback(new DownloadCompleteCallback() {
+
+                @Override
+                public void downloadComplete(String result) {
+
+                    if (result == null) {
+                        if (errorCallback != null) {
+                            handler.post(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    errorCallback.errorOccurred();
+                                }
+                            });
+                        }
+                        return;
+                    }
+
+                    final ArrayList<RouteSegment> departures = new ArrayList<RouteSegment>();
+                    JSONObject jObject;
+                    try {
+                        jObject = new JSONObject(result);
+                        jObject = jObject.getJSONObject("getdeparturesresult");
+
+                        if (!jObject.has("departuresegment")) { // return empty result
+                            // list instead of
+                            // crashing
+                            handler.post(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    callback.departuresComplete(departures);
+                                }
+                            });
+                            return;
+                        }
 
                         //Since the response is either an array or object depending on the result
                         //contains one or more departures, we need to try parse as Array and if no avail
@@ -539,75 +558,142 @@ public class ResrobotClient {
                             }
                         }
 
-						handler.post(new Runnable() {
-							@Override
-							public void run() {
-								callback.departuresComplete(departures);
-							}
-						});
-					} catch (JSONException e) {
-						if (errorCallback != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.departuresComplete(departures);
+                            }
+                        });
+                    } catch (JSONException e) {
+                        if (errorCallback != null) {
 
-							handler.post(new Runnable() {
-								
-								@Override
-								public void run() {
-									errorCallback.errorOccurred();
-								}
-							});
-						}
-						e.printStackTrace();
-					}
-				}
-			});
-			task.execute(url);
-		} catch (MalformedURLException e) {
-			if (errorCallback != null) {
-				errorCallback.errorOccurred();
-			}
-			e.printStackTrace();
-		}
-	}
+                            handler.post(new Runnable() {
 
+                                @Override
+                                public void run() {
+                                    errorCallback.errorOccurred();
+                                }
+                            });
+                        }
+                        e.printStackTrace();
+                    }
+                    if(getIsMultiThreaded()){
+                        QueuedDownloadTaskComplete(task);
+                    }
+                }
+            });
+
+            this.executeDownloadTask(task, url);
+        } catch (MalformedURLException e) {
+            if (errorCallback != null) {
+                errorCallback.errorOccurred();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    private void QueuedDownloadTaskComplete(DownloadTask completedTask){
+        this.openTasks--;
+        try {
+            executeDownloadQueuedTask();
+        }
+        catch(Exception ex){
+
+        }
+
+    }
+
+    private void executeDownloadQueuedTask() throws Exception{
+        if(this.getIsMultiThreaded()){
+            if(this.mDownloadTaskQueue.size() > 0 && this.openTasks < this.getConcurrentThreadLimit()){
+                DownloadQueueTask queuedTask = this.mDownloadTaskQueue.remove(this.mDownloadTaskQueue.size() - 1);
+                if(queuedTask.getURL() != null)
+                    queuedTask.getDownloadTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, queuedTask.getURL());
+                else
+                    queuedTask.getDownloadTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+                this.openTasks++;
+                Log.d("Stack size", Integer.toString(this.mDownloadTaskQueue.size()));
+            }
+        }
+        else{
+            throw new Exception("Multi threading is not supported");
+        }
+    }
+
+    private void executeDownloadTask(DownloadTask task, URL url){
+
+        if(this.getIsMultiThreaded()){
+            this.mDownloadTaskQueue.add(new DownloadQueueTask(task, url));
+            try {
+                this.executeDownloadQueuedTask();
+            }
+            catch (Exception ex){
+
+            }
+        }
+        else{
+            if(url != null)
+                task.execute(url);
+            else
+                task.execute();
+        }
+    }
 	/* Getters and setters */
 
-	public String getDeparturesKey() {
-		return departuresKey;
-	}
+    public String getDeparturesKey() {
+        return departuresKey;
+    }
 
-	public void setDeparturesKey(String departuresKey) {
-		this.departuresKey = departuresKey;
-	}
+    public void setDeparturesKey(String departuresKey) {
+        this.departuresKey = departuresKey;
+    }
 
-	public boolean isSuper() {
-		return isSuper;
-	}
+    public boolean isSuper() {
+        return isSuper;
+    }
 
-	public void setSuper(boolean isSuper) {
-		this.isSuper = isSuper;
-	}
+    public void setSuper(boolean isSuper) {
+        this.isSuper = isSuper;
+    }
 
-	public CoordSys getCoordSys() {
-		return coordSys;
-	}
+    public CoordSys getCoordSys() {
+        return coordSys;
+    }
 
-	public void setCoordSys(CoordSys coordSys) {
-		this.coordSys = coordSys;
-	}
+    public void setCoordSys(CoordSys coordSys) {
+        this.coordSys = coordSys;
+    }
 
-	public String getApiVersion() {
-		return apiVersion;
-	}
+    public String getApiVersion() {
+        return apiVersion;
+    }
 
-	public void setApiVersion(String apiVersion) {
-		this.apiVersion = apiVersion;
-	}
+    public void setApiVersion(String apiVersion) {
+        this.apiVersion = apiVersion;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setIsMultiThreaded(boolean multiThreaded){
+        this.mMultiThreaded = multiThreaded;
+    }
+
+    public boolean getIsMultiThreaded(){
+        return this.mMultiThreaded && Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB;
+    }
+
+    public void setConcurrentThreadLimit(int limit){
+        this.mConcurrentThreadLimit = limit;
+    }
+
+    public int getConcurrentThreadLimit(){
+        return this.mConcurrentThreadLimit;
+    }
 }

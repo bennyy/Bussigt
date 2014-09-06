@@ -18,4 +18,6 @@
 
     <string name="ResrobotAPIKey">tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr</string>
     <string name="ResrobotStolptidsAPIKey">fpxSHgtvTNvtPvPzE1rfxt6rVBZqPzLF</string>
+
+    <string name="LOCATION_ID">LOCATION_ID</string>
 </resources>
