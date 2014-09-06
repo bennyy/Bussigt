@@ -16,5 +16,6 @@
     <string name="title_activity_station_list_favorites">Favorites</string>
     <string name="title_activity_station_list_closest">Closest</string>
 
-    <string name="ResrobotAPIKey">fpxSHgtvTNvtPvPzE1rfxt6rVBZqPzLF</string>
+    <string name="ResrobotAPIKey">tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr</string>
+    <string name="ResrobotStolptidsAPIKey">fpxSHgtvTNvtPvPzE1rfxt6rVBZqPzLF</string>
 </resources>

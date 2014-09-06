@@ -1,13 +1,26 @@
 package com.bom.bussig.Activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.res.Resources;
+import android.graphics.RectF;
+import android.media.Image;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.bom.bussig.Adapter.LineListAdapter;
+import com.bom.bussig.Helpers.AlphaForegroundColorSpan;
 import com.bom.bussig.R;
 import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
@@ -29,12 +42,59 @@ om man swishar på en linje blir det typ (säg Skäggetorp)
 
 Yay!
  */
-public class LineListActivity extends ListActivity {
+public class LineListActivity extends Activity {
+
+    private ListView lineListView;
+    private View placeHolderView;
+    private View header;
+    private ImageView headerLogo;
+    private int mHeaderHeight;
+    private int mMinHeaderTranslation;
+    private int mActionBarHeight;
+    private AlphaForegroundColorSpan alphaForegroundColorSpan;
+    private SpannableString mSpannableString;
+
+
+    private TypedValue mTypedValue = new TypedValue();
+    private int actionBarTitleColor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_line_list);
+
+        mHeaderHeight = getResources().getDimensionPixelSize(R.dimen.header_height);
+        mMinHeaderTranslation = -mHeaderHeight + getActionBarHeight();
+        //Eeeh...?
+        //setContentView(R.layout.activity_noboringactionbar);
+
+        setContentView(R.layout.line_list_fancy_header);
+
+
+        lineListView = (ListView) findViewById(R.id.listview);
+        header = findViewById(R.id.header);
+        //headerLogo = (ImageView) findViewById(R.id.header_logo);
+
+        //View mFakeHeader = getLayoutInflater().inflate(R.layout.line_list_fancy_fake_header, mListView, false);
+        //mListView.addHeaderView(mFakeHeader);
+
+        actionBarTitleColor = getResources().getColor(R.color.actionbar_title_color);
+
+        mSpannableString = new SpannableString(getString(R.string.dontbreak));
+        alphaForegroundColorSpan = new AlphaForegroundColorSpan(actionBarTitleColor);
+
+        setupActionBar();
+        setupLineList();
+
+
+    }
+
+    private void setupLineList() {
+        placeHolderView = getLayoutInflater().inflate(R.layout.line_list_fancy_fake_header, lineListView, false);
+        lineListView.addHeaderView(placeHolderView);
+
+
+        // TODO: Felhantera
 
         ResrobotClient client = new ResrobotClient("tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr", "tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr");
 
@@ -43,11 +103,88 @@ public class LineListActivity extends ListActivity {
             public void departuresComplete(ArrayList<RouteSegment> result) {
                 Log.d("LineListAct", "Hamtade data bra och najs o så!");
                 LineListAdapter lineListAdapter = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, result);
-                setListAdapter(lineListAdapter);
+                //setListAdapter(lineListAdapter);
+                lineListView.setAdapter(lineListAdapter);
             }
         });
+
+        lineListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int scrollY = getScrollY();
+
+                // kladdig actionbar
+                header.setTranslationY(Math.max(-scrollY, mMinHeaderTranslation));
+
+                float ratio = clamp(header.getTranslationY() / mMinHeaderTranslation, 0.0f, 1.0f);
+                //actionbar title alpha
+                setTitleAlpha(clamp(5.0F * ratio - 4.0F, 0.0F, 1.0F));
+
+            }
+        }
+
+        );
+
+
     }
 
+    private void setTitleAlpha(float alpha) {
+        alphaForegroundColorSpan.setAlpha(alpha);
+        mSpannableString.setSpan(alphaForegroundColorSpan, 0, mSpannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        getActionBar().setTitle(mSpannableString);
+    }
+
+    private float clamp(float value, float max, float min) {
+        return Math.max(Math.min(value, min), max);
+    }
+
+    private void setupActionBar() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setIcon(R.drawable.logo1);
+
+        //getActionBarTitleView().setAlpha(0f);
+    }
+
+    private int getScrollY() {
+        View c = lineListView.getChildAt(0);
+        if (c == null) {
+            return 0;
+        }
+
+        int firstVisiblePosition = lineListView.getFirstVisiblePosition();
+        int top = c.getTop();
+
+        int headerHeight = 0;
+        if (firstVisiblePosition >= 1) {
+            headerHeight = lineListView.getHeight();
+        }
+
+        return -top + firstVisiblePosition * c.getHeight() + headerHeight;
+    }
+
+    public int getActionBarHeight() {
+        if (mActionBarHeight != 0) {
+            return mActionBarHeight;
+        }
+        getTheme().resolveAttribute(android.R.attr.actionBarSize, mTypedValue, true);
+        mActionBarHeight = TypedValue.complexToDimensionPixelSize(mTypedValue.data, getResources().getDisplayMetrics());
+        return mActionBarHeight;
+    }
+
+    private TextView getActionBarTitleView() {
+        int id = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
+        return (TextView) findViewById(id);
+    }
+
+    private RectF getOnScreenRect(RectF rect, View view) {
+        rect.set(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+        return rect;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
