@@ -12,4 +12,8 @@
     <string name="direction">Asdf Zxdy </string>
     <string name="timeLeft">12</string>
 
+    <string name="title_activity_station_list_favorites">Favorites</string>
+    <string name="title_activity_station_list_closest">Closest</string>
+
+    <string name="ResrobotAPIKey">fpxSHgtvTNvtPvPzE1rfxt6rVBZqPzLF</string>
 </resources>
