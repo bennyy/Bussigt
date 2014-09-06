@@ -22,7 +22,8 @@ public class DepartureListActivity extends ListActivity {
     ArrayList<RouteSegment> currentDepartures;
     ArrayList<String> directions;
     String currentDirection = "Linköping Centralstation";
-    int busNumber = 12;
+    private int mBusNumber;
+    private int mLocationID;
 
 
 

@@ -3,7 +3,7 @@ package com.bom.bussig.Fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,8 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.bom.bussig.Activity.LineListActivity;
 import com.bom.bussig.Adapter.StationListAdapter;
 import com.bom.bussig.BussigApplication;
 import com.bom.bussig.Data.Location.LocationService;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * Created by Mackan on 2014-09-06.
  */
 public class ClosestStationListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
-
+    public String BUSS_ID = "BussID";
 
     private ResrobotClient resrobotClient;
     private LocationService mLocationService;
@@ -103,7 +103,7 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
                 public void stationsInZoneComplete(ArrayList<Location> locations) {
                     mStations = new ArrayList<Station>();
                     //Convert the result to our DataModel;
-                    for(int i = 0; i < locations.size() && i < 20; i++){
+                    for(int i = 0; i < locations.size() && i < BussigApplication.getContext().getResources().getInteger(R.integer.station_list_max); i++){
 
                         mStations.add(new Station(locations.get(i).getId(), locations.get(i).getName()));
                     }
@@ -118,12 +118,11 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
                         @Override
                         public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
                             final Station item = (Station) parent.getItemAtPosition(position);
-                            Context context = BussigApplication.getContext();
-                            CharSequence text = "click " + item.getName();
-                            int duration = Toast.LENGTH_SHORT;
+                            Intent intent = new Intent(BussigApplication.getContext(), LineListActivity.class);
 
-                            Toast toast = Toast.makeText(context, text, duration);
-                            toast.show();
+                            intent.putExtra(BussigApplication.getContext().getString(R.string.LOCATION_ID), item.getLocationID());
+
+                            startActivity(intent);
                         }
                     });
 

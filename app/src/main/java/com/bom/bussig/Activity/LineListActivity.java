@@ -2,6 +2,7 @@ package com.bom.bussig.Activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -54,7 +55,7 @@ public class LineListActivity extends Activity {
     private int mActionBarHeight;
     private AlphaForegroundColorSpan alphaForegroundColorSpan;
     private SpannableString mSpannableString;
-
+    private int mLocationID;
 
     private TypedValue mTypedValue = new TypedValue();
     private int actionBarTitleColor;
@@ -68,7 +69,8 @@ public class LineListActivity extends Activity {
         mMinHeaderTranslation = -mHeaderHeight + getActionBarHeight();
         //Eeeh...?
         //setContentView(R.layout.activity_noboringactionbar);
-
+        Intent intent = getIntent();
+        this.mLocationID = intent.getIntExtra(getString(R.string.LOCATION_ID),0);
         setContentView(R.layout.line_list_fancy_header);
 
 
@@ -101,7 +103,7 @@ public class LineListActivity extends Activity {
 
         ResrobotClient client = new ResrobotClient("tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr", "tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr");
 
-        client.departures(7400009, 120, new ResrobotClient.DeparturesCallback() {
+        client.departures(this.mLocationID, 120, new ResrobotClient.DeparturesCallback() {
             @Override
             public void departuresComplete(ArrayList<RouteSegment> result) {
                 Log.d("LineListAct", "Hamtade data bra och najs o så!");
