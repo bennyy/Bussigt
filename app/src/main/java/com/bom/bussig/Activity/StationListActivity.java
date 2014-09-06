@@ -13,7 +13,7 @@ public class StationListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_station_list);
+        setContentView(R.layout.activity_line_list);
     }
 
 

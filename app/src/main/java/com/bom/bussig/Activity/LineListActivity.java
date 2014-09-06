@@ -1,12 +1,13 @@
 package com.bom.bussig.Activity;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.bom.bussig.R;
 
-public class LineListActivity extends Activity {
+public class LineListActivity extends ListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
