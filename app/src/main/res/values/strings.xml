@@ -8,5 +8,8 @@
     <string name="title_activity_departure_list">DepartureListActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dontbreak">Dont break this!!</string>
+    <string name="lineNumber">1</string>
+    <string name="direction">Asdf Zxdy </string>
+    <string name="timeLeft">12</string>
 
 </resources>
