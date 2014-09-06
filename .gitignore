@@ -1,3 +1,7 @@
+
+/.idea/workspace.xml
+/.idea/libraries
+
 #built application files
 *.apk
 *.ap_
