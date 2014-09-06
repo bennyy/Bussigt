@@ -1,9 +1,13 @@
 package com.bom.bussig.Activity;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.bom.bussig.Fragment.DepartureListFragment;
 import com.bom.bussig.R;
 
 public class DepartureListActivity extends Activity {
@@ -12,6 +16,12 @@ public class DepartureListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_departure_list);
+
+        if (savedInstanceState == null) {
+            Fragment newFragment = new DepartureListFragment();
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(R.id.departure_list_fragment, newFragment);
+        }
     }
 
 
@@ -33,4 +43,5 @@ public class DepartureListActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

@@ -7,6 +7,7 @@
     <string name="title_activity_line_list">LineListActivity</string>
     <string name="title_activity_departure_list">DepartureListActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_bajs_fragment">Hello bajs fragment</string>
     <string name="dontbreak">Dont break this!!</string>
 
 </resources>

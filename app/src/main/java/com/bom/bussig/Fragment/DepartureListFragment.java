@@ -1,14 +1,20 @@
 package com.bom.bussig.Fragment;
 
-import android.app.Activity;
+import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
+import com.bom.bussig.Adapter.DepartureListAdapter;
 import com.bom.bussig.R;
+import com.mattiasbergstrom.resrobot.ResrobotClient;
+import com.mattiasbergstrom.resrobot.RouteSegment;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,6 +36,9 @@ public class DepartureListFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+
+    private ResrobotClient resrobotClient;
 
     /**
      * Use this factory method to create a new instance of
@@ -59,12 +68,17 @@ public class DepartureListFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        resrobotClient = new ResrobotClient("tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr", "tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        getDepartures(7456608, 120);
+
         return inflater.inflate(R.layout.fragment_departure_list, container, false);
     }
 
@@ -75,6 +89,7 @@ public class DepartureListFragment extends Fragment {
         }
     }
 
+    /*
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -84,7 +99,7 @@ public class DepartureListFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-    }
+    }*/
 
     @Override
     public void onDetach() {
@@ -105,6 +120,32 @@ public class DepartureListFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
+    }
+
+    private void getDepartures(int locationID, int timeSpan) {
+
+
+        Log.d("TEST", "HALLLÅ GET?");
+
+        try {
+            resrobotClient.departures(locationID, timeSpan, new ResrobotClient.DeparturesCallback() {
+
+                @Override
+                public void departuresComplete(ArrayList<RouteSegment> result) {
+                    Log.d("TEST", "HALLLÅ FICK?");
+                    ListView lv = (ListView)getView().findViewById(R.id.departuesListView);
+                    DepartureListAdapter listAdapter = new DepartureListAdapter(getActivity(), result);
+                    lv.setAdapter(listAdapter);
+                }
+            });
+
+        }
+        catch (Exception e){
+
+            Log.d("resrobot", e.toString());
+        }
+
+
     }
 
 }
