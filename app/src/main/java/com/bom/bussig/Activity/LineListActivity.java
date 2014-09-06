@@ -2,10 +2,8 @@ package com.bom.bussig.Activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.res.Resources;
 import android.graphics.RectF;
-import android.media.Image;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -21,9 +19,12 @@ import android.widget.TextView;
 
 import com.bom.bussig.Adapter.LineListAdapter;
 import com.bom.bussig.Helpers.AlphaForegroundColorSpan;
+import com.bom.bussig.Helpers.Coordinate;
+import com.bom.bussig.Helpers.StaticMap;
 import com.bom.bussig.R;
 import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -87,6 +88,8 @@ public class LineListActivity extends Activity {
         setupLineList();
 
 
+        setHeaderImage();
+
     }
 
     private void setupLineList() {
@@ -129,6 +132,19 @@ public class LineListActivity extends Activity {
         }
 
         );
+
+
+    }
+
+    private void setHeaderImage() {
+        ImageView headerImageView = (ImageView)findViewById(R.id.header_picture);
+        StaticMap headerMap = new StaticMap(new Coordinate(15.560494, 58.394281), new Coordinate(15.560580, 58.394281));
+
+        Picasso.with(this).load("http://maps.googleapis.com/maps/api/staticmap?center=58.394281,15.560494&zoom=18&size=800x400&markers=color:blue%7Clabel:S%7C58.394281,15.560580&key=AIzaSyDvjJbCT-MFD3y_Wie5i7JTLZ8H5thSf8Y").into(headerImageView);
+        //headerImageView.setImageBitmap(headerMap.getImage());
+
+        Log.d("wtf", "hej");
+
 
 
     }
