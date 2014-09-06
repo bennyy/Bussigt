@@ -3,18 +3,12 @@ package com.bom.bussig.Fragment;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
-import com.bom.bussig.Adapter.DepartureListAdapter;
 import com.bom.bussig.R;
 import com.mattiasbergstrom.resrobot.ResrobotClient;
-import com.mattiasbergstrom.resrobot.RouteSegment;
-
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -77,7 +71,7 @@ public class DepartureListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        getDepartures(7456608, 120);
+        //getDepartures(7456608, 120);
 
         return inflater.inflate(R.layout.fragment_departure_list, container, false);
     }
@@ -121,7 +115,7 @@ public class DepartureListFragment extends Fragment {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
-
+    /*
     private void getDepartures(int locationID, int timeSpan) {
 
 
@@ -146,6 +140,6 @@ public class DepartureListFragment extends Fragment {
         }
 
 
-    }
+    }*/
 
 }

@@ -1,5 +1,7 @@
 package com.mattiasbergstrom.resrobot;
 
+import android.os.AsyncTask;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,8 +9,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import android.os.AsyncTask;
 
 public class DownloadTask extends AsyncTask<URL, Void, Void> {
 	
@@ -32,7 +32,7 @@ public class DownloadTask extends AsyncTask<URL, Void, Void> {
 			
 			InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 			
-			BufferedReader inReader = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
+			BufferedReader inReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			String line = null;
 			while((line = inReader.readLine()) != null) {
 				result += line;

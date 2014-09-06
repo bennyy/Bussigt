@@ -1,6 +1,5 @@
 package com.bom.bussig.Adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,39 +10,57 @@ import android.widget.TextView;
 import com.bom.bussig.R;
 import com.mattiasbergstrom.resrobot.RouteSegment;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Oskar on 2014-09-06.
  */
-public class DepartureListAdapter extends ArrayAdapter<RouteSegment>{
+public class DepartureListAdapter extends ArrayAdapter<RouteSegment> {
 
-    private final Activity context;
-    private final ArrayList<RouteSegment> itemsArrayList;
-
-    public DepartureListAdapter(Activity context, ArrayList<RouteSegment> itemsArrayList) {
-        super(context, R.layout.departure_list_row, itemsArrayList);
+    private Context context;
+    public DepartureListAdapter(Context context, int resource, List<RouteSegment> departureList) {
+        super(context, resource, departureList);
 
         this.context = context;
-        this.itemsArrayList = itemsArrayList;
-    }
-
-    static class ViewHolder {
-        public TextView title;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.departure_list_row, parent, false);
-        TextView textView = (TextView) rowView.findViewById(R.id.departureRowTextView);
+        View view = convertView;
 
-        RouteSegment routeSegment = itemsArrayList.get(position);
-        textView.setText(routeSegment.getDeparture().getLocation().getName());
+        if(view == null) {
+            LayoutInflater vi = LayoutInflater.from(getContext());
+            view = vi.inflate(R.layout.departure_list_row, null);
+        }
+        RouteSegment routeSegment = getItem(position);
+
+        if(routeSegment != null) {
+            Date leaveDate = routeSegment.getDeparture().getDateTime();
+            Date timeNow = new Date();
 
 
+            //print bus number
+            TextView busNumberText = (TextView) view.findViewById(R.id.bus_number);
+            busNumberText.setText(Integer.toString(routeSegment.getSegmentId().getCarrier().getNumber()));
 
-        return rowView;
+            //print avgångstid
+            TextView leavingText = (TextView) view.findViewById(R.id.leaving);
+            SimpleDateFormat leaveDateFormat = new SimpleDateFormat("HH:mm");
+            leavingText.setText(leaveDateFormat.format(leaveDate));
+
+            //printa tid kvar i minuter
+            TextView timeLeftText = (TextView) view.findViewById(R.id.timeLeft);
+            long timeleft = ((leaveDate.getTime()/60000) - (timeNow.getTime()/60000));
+            timeLeftText.setText(Integer.toString((int)timeleft) + " minuter");
+
+            //printa direction
+            TextView directionText = (TextView) view.findViewById(R.id.direction);
+            directionText.setText(routeSegment.getDirection());
+
+        }
+
+        return view;
     }
 }
