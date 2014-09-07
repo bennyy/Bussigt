@@ -74,6 +74,7 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
         this.mSwipeLayout.setColorScheme(android.R.color.darker_gray, android.R.color.black,android.R.color.darker_gray,android.R.color.black);
 
         loadClosestStations(getLocation().getLongitude(), getLocation().getLatitude());
+        //loadClosestStations(15.623509, 58.414957);
 
         return this.mView;
     }

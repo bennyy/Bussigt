@@ -43,6 +43,7 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getApplicationContext(),getFragmentManager());
 
         mViewPager = (ViewPager)findViewById(R.id.activity_station_list);
