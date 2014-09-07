@@ -99,7 +99,7 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
+        mViewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override

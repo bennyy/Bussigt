@@ -1,6 +1,7 @@
 package com.bom.bussig.Activity;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.bom.bussig.Adapter.DepartureListAdapter;
+import com.bom.bussig.BussigApplication;
 import com.bom.bussig.R;
 import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
@@ -21,10 +23,10 @@ public class DepartureListActivity extends ListActivity {
     ResrobotClient resrobotClient;
     ArrayList<RouteSegment> currentDepartures;
     ArrayList<String> directions;
-    String currentDirection = "Linköping Centralstation";
+    private String mCurrentDirection;
     private int mBusNumber;
     private int mLocationID;
-
+    private RouteSegment mRouteSegment;
 
 
     @Override
@@ -33,10 +35,15 @@ public class DepartureListActivity extends ListActivity {
         setContentView(R.layout.activity_departure_list);
         registerForContextMenu(getListView());
 
-        resrobotClient = new ResrobotClient("tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr", "tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr");
-        setTitle(currentDirection);
+        resrobotClient = new ResrobotClient(BussigApplication.getContext().getString(R.string.ResrobotAPIKey), BussigApplication.getContext().getString(R.string.ResrobotStolptidsAPIKey));
+        Intent intent = getIntent();
+        this.mRouteSegment = (RouteSegment)intent.getParcelableExtra(getString(R.string.ROUTE_SEGMENT));
+        this.mLocationID = this.mRouteSegment.getDeparture().getLocation().getId();
+        this.mBusNumber = this.mRouteSegment.getSegmentId().getCarrier().getNumber();
+        this.mCurrentDirection = this.mRouteSegment.getDirection();
+        setTitle(this.mCurrentDirection);
         directions = new ArrayList<String>();
-        getDepartues(7456608, 120);
+        getDepartues(this.mLocationID, 120);
 
     }
 
@@ -71,10 +78,10 @@ public class DepartureListActivity extends ListActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_switch_direction:
-                int directionIndex = directions.indexOf(currentDirection);
+                int directionIndex = directions.indexOf(mCurrentDirection);
                 directionIndex++;
-                currentDirection = directions.get(directionIndex%directions.size());
-                updateListView(filterDepartures(currentDirection));
+                mCurrentDirection = directions.get(directionIndex%directions.size());
+                updateListView(filterDepartures(mCurrentDirection));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -95,14 +102,14 @@ public class DepartureListActivity extends ListActivity {
                         directions.add(routeSegment.getDirection());
                     }
                 }
-                setListViewAdapter(filterDepartures(currentDirection));
+                setListViewAdapter(filterDepartures(mCurrentDirection));
             }
         });
 
     }
 
     private ArrayList<RouteSegment> filterDepartures(String direction){
-        setTitle(currentDirection);
+        setTitle(mCurrentDirection);
         ArrayList<RouteSegment> retain = new ArrayList<RouteSegment>(currentDepartures.size());
         for (RouteSegment routeSegment : currentDepartures) {
             //filter out bus number

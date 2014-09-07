@@ -18,9 +18,10 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bom.bussig.Adapter.LineListAdapter;
+import com.bom.bussig.Data.Location.LocationService;
+import com.bom.bussig.BussigApplication;
 import com.bom.bussig.Helpers.AlphaForegroundColorSpan;
 import com.bom.bussig.Helpers.Coordinate;
 import com.bom.bussig.Helpers.StaticMap;
@@ -31,9 +32,6 @@ import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
 import com.squareup.picasso.Picasso;
 
-import org.apache.http.impl.client.RoutedRequest;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,6 +64,7 @@ public class LineListActivity extends Activity {
     private AlphaForegroundColorSpan alphaForegroundColorSpan;
     private SpannableString mSpannableString;
     private int mLocationID;
+    private LocationService locationService;
 
     private TypedValue mTypedValue = new TypedValue();
     private int actionBarTitleColor;
@@ -77,17 +76,43 @@ public class LineListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        locationService = new LocationService(this);
 
         mHeaderHeight = getResources().getDimensionPixelSize(R.dimen.header_height);
         mMinHeaderTranslation = -mHeaderHeight + getActionBarHeight();
         //Eeeh...?
         //setContentView(R.layout.activity_noboringactionbar);
+
+        setContentView(R.layout.line_list_fancy_header);
+
         Intent intent = getIntent();
         this.mLocationID = intent.getIntExtra(getString(R.string.LOCATION_ID),0);
-        setContentView(R.layout.line_list_fancy_header);
 
 
         lineListView = (SwipeListView) findViewById(R.id.listview);
+        lineListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                final RouteSegment item = (RouteSegment) parent.getItemAtPosition(position);
+                Intent intent = new Intent(BussigApplication.getContext(), DepartureListActivity.class);
+
+                intent.putExtra(BussigApplication.getContext().getString(R.string.ROUTE_SEGMENT), item);
+
+                startActivity(intent);
+            }
+        });
+
+        lineListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                //((TextView) view.findViewById((R.id.bussnr))).getText();
+
+                return true;
+            }
+        });
+
         header = findViewById(R.id.header);
         //headerLogo = (ImageView) findViewById(R.id.header_logo);
 
@@ -104,6 +129,8 @@ public class LineListActivity extends Activity {
 
 
         setHeaderImage();
+
+
 
     }
 
@@ -352,15 +379,10 @@ public class LineListActivity extends Activity {
 
     private void setHeaderImage() {
         ImageView headerImageView = (ImageView)findViewById(R.id.header_picture);
-        StaticMap headerMap = new StaticMap(new Coordinate(15.560494, 58.394281), new Coordinate(15.560580, 58.394281));
-
-        Picasso.with(this).load("http://maps.googleapis.com/maps/api/staticmap?center=58.394281,15.560494&zoom=18&size=800x400&markers=color:blue%7Clabel:S%7C58.394281,15.560580&key=AIzaSyDvjJbCT-MFD3y_Wie5i7JTLZ8H5thSf8Y").into(headerImageView);
-        //headerImageView.setImageBitmap(headerMap.getImage());
-
-        Log.d("wtf", "hej");
-
-
-
+        headerImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        android.location.Location myLocation = locationService.getLocation();
+        StaticMap headerMap = new StaticMap(myLocation, new Coordinate(15.569680,58.394281));
+        Picasso.with(this).load(headerMap.getUrl()).into(headerImageView);
     }
 
     private void setTitleAlpha(float alpha) {
@@ -375,7 +397,14 @@ public class LineListActivity extends Activity {
 
     private void setupActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setIcon(R.drawable.logo1);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayUseLogoEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayShowCustomEnabled(true);
+        View headerView = getLayoutInflater().inflate(R.layout.line_list_action_bar_layout, null);
+        actionBar.setCustomView(headerView);
+        //actionBar.setIcon(R.drawable.logo1);
 
         //getActionBarTitleView().setAlpha(0f);
     }
