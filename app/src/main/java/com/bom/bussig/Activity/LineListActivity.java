@@ -236,29 +236,10 @@ public class LineListActivity extends Activity {
                         foundIt = true;
                         break;
                     }
-
                 }
                 if(!foundIt) {
                     groupedView.get(line).add(routeSegment);
                 }
-                //groupedView.get(line).add(routeSegment);
-                /*
-                //Men vi vill inte ha samma direction på varje, då man vill ändra håll enkelt.
-                ArrayList<RouteSegment> temp = groupedView.get(line);
-                for(RouteSegment rs : temp) {
-
-
-                    // Kollar efter dubletter, vi vill inte ha flera med en destionation
-                    boolean foundIt = false;
-                    if(routeSegment.getDirection().equals(rs.getDirection())) {
-                        foundIt = true;
-                    }
-                    else if(!foundIt) {
-                        groupedView.get(line).add(routeSegment);
-                    }
-
-                }*/
-
             }
             else {
                 groupedView.put(line, new ArrayList<RouteSegment>());
