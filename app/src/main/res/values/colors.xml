@@ -1,5 +1,6 @@
 <resources>
     <color name="main">#63C3FF</color>
     <color name="actionbar_title_color">@android:color/white</color>
-    <color name="text_shadow">#7F000000</color>
+    <color name="text_shadow">#7F000000</color>3
+    <color name="black">#000000</color>
 </resources>

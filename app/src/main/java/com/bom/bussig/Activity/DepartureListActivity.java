@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 
 import com.bom.bussig.Adapter.DepartureListAdapter;
 import com.bom.bussig.BussigApplication;
+import com.bom.bussig.Helpers.AlarmManagerBroadcastReceiver;
 import com.bom.bussig.R;
 import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
@@ -27,14 +28,22 @@ public class DepartureListActivity extends ListActivity {
     private int mBusNumber;
     private int mLocationID;
     private RouteSegment mRouteSegment;
-
+    private AlarmManagerBroadcastReceiver alarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_departure_list);
         registerForContextMenu(getListView());
-
+        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final RouteSegment item = (RouteSegment) adapterView.getItemAtPosition(i);
+                alarm.setOnetimeTimer(BussigApplication.getContext(), item);
+                return true;
+            }
+        });
+        this.alarm = new AlarmManagerBroadcastReceiver();
         resrobotClient = new ResrobotClient(BussigApplication.getContext().getString(R.string.ResrobotAPIKey), BussigApplication.getContext().getString(R.string.ResrobotStolptidsAPIKey));
         Intent intent = getIntent();
         this.mRouteSegment = (RouteSegment)intent.getParcelableExtra(getString(R.string.ROUTE_SEGMENT));

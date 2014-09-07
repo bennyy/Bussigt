@@ -1,23 +1,20 @@
 package com.bom.bussig.Adapter;
 
 import android.content.Context;
-<<<<<<< HEAD
 import android.location.Location;
-=======
+
 import android.util.Log;
->>>>>>> 2954f485b90b4ce265943333235a2647e14eeaca
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
-<<<<<<< HEAD
 import com.bom.bussig.Data.Location.LocationService;
 import com.bom.bussig.Helpers.StationTranslator;
-=======
+
 import com.bom.bussig.BussigApplication;
->>>>>>> 2954f485b90b4ce265943333235a2647e14eeaca
+
 import com.bom.bussig.Model.Departure;
 import com.bom.bussig.Model.Station;
 import com.bom.bussig.R;

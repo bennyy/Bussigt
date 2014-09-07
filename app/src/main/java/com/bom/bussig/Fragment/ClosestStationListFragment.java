@@ -207,7 +207,7 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
             @Override public void run() {
                 mSwipeLayout.setRefreshing(false);
             }
-        }, 2000);
+        }, 1000);
     }
 
 

@@ -22,20 +22,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BusNr1"
-            style="@style/StationListLineNumber"/>
+            style="@style/StationListLineNumber"
+            android:textColor="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BusDirection1"
             android:textAlignment="center"
-            style="@style/StationListDirection" />
+            style="@style/StationListDirection"
+            android:textColor="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BusMinutes1"
-            style="@style/StationListMinutes" />
+            style="@style/StationListMinutes"
+            android:textColor="@color/black"/>
 
     </RelativeLayout>
 
@@ -50,20 +53,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BusNr2"
-            style="@style/StationListLineNumber"/>
+            style="@style/StationListLineNumber"
+            android:textColor="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/loadingStations"
             android:id="@+id/BusDirection2"
-            style="@style/StationListDirection"/>
+            style="@style/StationListDirection"
+            android:textColor="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BusMinutes2"
-            style="@style/StationListMinutes"/>
+            style="@style/StationListMinutes"
+            android:textColor="@color/black"/>
 
     </RelativeLayout>
 
@@ -78,19 +84,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BusNr3"
-            style="@style/StationListLineNumber"/>
+            style="@style/StationListLineNumber"
+            android:textColor="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BusDirection3"
-            style="@style/StationListDirection"/>
+            style="@style/StationListDirection"
+            android:textColor="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BusMinutes3"
-            style="@style/StationListMinutes"/>
+            style="@style/StationListMinutes"
+            android:textColor="@color/black"/>
 
     </RelativeLayout>
 </LinearLayout>
