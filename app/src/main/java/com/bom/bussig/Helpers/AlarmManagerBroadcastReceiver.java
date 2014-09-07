@@ -12,15 +12,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
-import android.widget.Toast;
 
 import com.bom.bussig.BussigApplication;
 import com.bom.bussig.R;
-import com.mattiasbergstrom.resrobot.RouteSegment;
-
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.media.RingtoneManager.getDefaultUri;
@@ -43,16 +37,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         //You can do the processing here.
         Bundle extras = intent.getExtras();
         StringBuilder msgStr = new StringBuilder();
-        RouteSegment routeSegment = (RouteSegment)intent.getSerializableExtra("routeSegment");
-
-        if(extras != null && extras.getBoolean(ONE_TIME, Boolean.FALSE)){
-            //Make sure this intent has been sent by the one-time timer button.
-            msgStr.append("One time Timer : ");
-        }
-        Format formatter = new SimpleDateFormat("hh:mm:ss a");
-        msgStr.append(formatter.format(new Date()));
-
-        Toast.makeText(context, msgStr, Toast.LENGTH_LONG).show();
+        //RouteSegment routeSegment = (RouteSegment)intent.getSerializableExtra("routeSegment");
 
         int requestID = (int) System.currentTimeMillis();
         Uri alarmSound = getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -73,7 +58,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
                         .setAutoCancel(true)
                         .setSound(alarmSound)
                         .setContentTitle(BussigApplication.getContext().getString(R.string.alarm_notification_title))
-                        .setContentText(String.format(BussigApplication.getContext().getString(R.string.alarm_notification)))
+                        .setContentText(BussigApplication.getContext().getString(R.string.alarm_notification))
                         //.addAction(R.drawable.ic_launcher, "Stoppa!", contentIntent)
                         //.addAction(R.drawable.ic_launcher, "Buu!", contentIntent)
                         .setVibrate(pattern)
@@ -106,12 +91,12 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         alarmManager.cancel(sender);
     }
 
-    public void setOnetimeTimer(Context context, RouteSegment routeSegment){
+    public void setOnetimeTimer(Context context, int minutes){
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
         intent.putExtra(ONE_TIME, Boolean.TRUE);
-        intent.putExtra("routeSegment", routeSegment);
+        //intent.putExtra("routeSegment", routeSegment);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + minutes * 1000, pi);
     }
 }
