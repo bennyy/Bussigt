@@ -90,7 +90,7 @@ public class DepartureListActivity extends ListActivity {
                 currentDepartures = result;
                 for (RouteSegment routeSegment : result) {
                     //add direction to directions list if not already exists
-                    if (routeSegment.getSegmentId().getCarrier().getNumber() == busNumber
+                    if (routeSegment.getSegmentId().getCarrier().getNumber() == mBusNumber
                             && !directions.contains(routeSegment.getDirection())){
                         directions.add(routeSegment.getDirection());
                     }
@@ -106,7 +106,7 @@ public class DepartureListActivity extends ListActivity {
         ArrayList<RouteSegment> retain = new ArrayList<RouteSegment>(currentDepartures.size());
         for (RouteSegment routeSegment : currentDepartures) {
             //filter out bus number
-            if (routeSegment.getSegmentId().getCarrier().getNumber() == busNumber
+            if (routeSegment.getSegmentId().getCarrier().getNumber() == mBusNumber
                     && routeSegment.getDirection().equals(direction)) {
                 retain.add(routeSegment);
             }
