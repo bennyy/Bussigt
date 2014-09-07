@@ -21,4 +21,11 @@
 
     <string name="LOCATION_ID">LOCATION_ID</string>
     <string name="ROUTE_SEGMENT">ROUTE_SEGMENT</string>
+
+
+    <string name="Landbogatan">Lambohov</string>
+    <string name="LinkopingCentralstation">Linköping Resecentrum</string>
+    <string name="Stenaldersgatan">Skäggetorp/Vidingsjö</string>
+    <string name="Rydsvagensandhallpl.">Ryd</string>
+
 </resources>

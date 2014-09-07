@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.bom.bussig.Helpers.StationTranslator;
 import com.bom.bussig.R;
 import com.mattiasbergstrom.resrobot.RouteSegment;
 
@@ -18,10 +19,12 @@ import java.util.List;
 public class LineListAdapter extends ArrayAdapter<RouteSegment> {
 
     private Context context;
+    private StationTranslator stationTranslator;
     public LineListAdapter(Context context, int resource, List<RouteSegment> stopList) {
         super(context, resource, stopList);
 
         this.context = context;
+        stationTranslator = new StationTranslator();
     }
 
     @Override
@@ -42,8 +45,8 @@ public class LineListAdapter extends ArrayAdapter<RouteSegment> {
             // Set line number
             txtLineNumber.setText(Integer.toString(routeSegment.getSegmentId().getCarrier().getNumber()));
 
-            // Set direction
-            txtDirection.setText(routeSegment.getDirection());
+            // Set direction, translate also
+            txtDirection.setText(stationTranslator.translateStation(routeSegment.getDirection()));
 
             // Set time left (minutes)
             txtTimeLeft.setText(Long.toString(routeSegment.getDeparture().getMinutesToDeparture()));
