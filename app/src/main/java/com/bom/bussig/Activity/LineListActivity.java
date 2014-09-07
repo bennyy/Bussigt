@@ -14,9 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bom.bussig.Adapter.LineListAdapter;
 import com.bom.bussig.Data.Location.LocationService;
@@ -28,7 +30,13 @@ import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
 import com.squareup.picasso.Picasso;
 
+import org.apache.http.impl.client.RoutedRequest;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /*
 Denna ska ju lista alla LINJER från EN hållplats
@@ -62,6 +70,8 @@ public class LineListActivity extends Activity {
     private TypedValue mTypedValue = new TypedValue();
     private int actionBarTitleColor;
 
+    private HashMap<Integer, ArrayList<RouteSegment>> groupedView = new HashMap<Integer, ArrayList<RouteSegment>>();
+    ArrayList<RouteSegment> heraderp = new ArrayList<RouteSegment>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,12 +119,83 @@ public class LineListActivity extends Activity {
         ResrobotClient client = new ResrobotClient("tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr", "tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr");
 
         client.departures(this.mLocationID, 120, new ResrobotClient.DeparturesCallback() {
+
             @Override
             public void departuresComplete(ArrayList<RouteSegment> result) {
                 Log.d("LineListAct", "Hamtade data bra och najs o så!");
                 LineListAdapter lineListAdapter = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, result);
+                takeEverythingAndDoItMoreBetterThanShit(result);
+
+
+
+                // Woah!
+                Iterator it = groupedView.entrySet().iterator();
+                while(it.hasNext()) {
+                    Map.Entry item = (Map.Entry)it.next();
+                    heraderp.add( ((ArrayList<RouteSegment>) item.getValue()).get(0));
+                    //it.remove();
+                }
+
                 //setListAdapter(lineListAdapter);
-                lineListView.setAdapter(lineListAdapter);
+                LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                lineListView.setAdapter(lla);
+            }
+        });
+
+        lineListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                RouteSegment routesegment = (RouteSegment)lineListView.getItemAtPosition(position);
+                // Ta in linjenumret här och do magic!
+                int line = routesegment.getSegmentId().getCarrier().getNumber();
+                String direction = routesegment.getDirection();
+                int indexToBeChoosen = 0;
+                int numberOfLines = groupedView.get(line).size();
+
+                if(numberOfLines > 1) {
+                    // Hitta vart den ligger i listan, av den linjen
+                    for(int i = 0; i < numberOfLines; i++) {
+                        RouteSegment routeSegment = groupedView.get(line).get(i);
+                        if(routeSegment.getDirection().equals(direction)) {
+                            if(i == numberOfLines - 1) {
+                                // om det slår "över"
+                                indexToBeChoosen = 0;
+                            }
+                            else {
+                                // Annars är de ju bara ta nästa
+                                indexToBeChoosen = ++i;
+                            }
+                            break;
+                        }
+                    }
+                }
+                else {
+                    Log.d("LineListActivity", "Det är bara en resa från ett håll inom närmaste 120 min");
+                }
+
+
+                // Hitta vilket index i AdapterListan som den ligger på
+                // som ska ändras. Vi vill ju bevara de förra ändringarna som fanns i listan också
+                int itemToBeChanged = 0;
+                for(int i = 0; i < heraderp.size(); i++) {
+                    if(line == heraderp.get(i).getSegmentId().getCarrier().getNumber()) {
+                        itemToBeChanged = i;
+                        break;
+                    }
+                }
+
+                Iterator it = groupedView.entrySet().iterator();
+                while(it.hasNext()) {
+                    Map.Entry item = (Map.Entry)it.next();
+                    if(line == (Integer)item.getKey()) {
+                        heraderp.set(itemToBeChanged, ((ArrayList<RouteSegment>) item.getValue()).get(indexToBeChoosen));
+                    }
+                    //it.remove();
+                }
+
+                LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                lineListView.setAdapter(lla);
             }
         });
 
@@ -141,6 +222,35 @@ public class LineListActivity extends Activity {
         );
 
 
+    }
+    private ArrayList<RouteSegment> mycketNajs = new ArrayList<RouteSegment>();
+
+    private void takeEverythingAndDoItMoreBetterThanShit(ArrayList<RouteSegment> result) {
+        for (RouteSegment routeSegment : result) {
+            // FÖR VARJE JÄVLA ROUTE SEGMENT VI FÅR!!! :((
+            int line = routeSegment.getSegmentId().getCarrier().getNumber();
+            String direction = routeSegment.getDirection();
+
+            // Om nyckeln redan finns, då ska ju mer data läggas till!
+            // OCH OM NYCKELN REDAN FINNS
+            if(groupedView.containsKey(line)) {
+
+                boolean foundIt = false;
+                for(int i = 0; i < groupedView.get(line).size(); i++) {
+                    if(direction.equals(groupedView.get(line).get(i).getDirection())) {
+                        foundIt = true;
+                        break;
+                    }
+                }
+                if(!foundIt) {
+                    groupedView.get(line).add(routeSegment);
+                }
+            }
+            else {
+                groupedView.put(line, new ArrayList<RouteSegment>());
+                groupedView.get(line).add(routeSegment);
+            }
+        }
     }
 
     private void setHeaderImage() {
