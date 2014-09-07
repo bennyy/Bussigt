@@ -4,11 +4,18 @@
     android:layout_height="match_parent"
     tools:context="com.bom.bussig.Activity.LineListActivity">
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/listview"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+    <!--<ListView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/listview"
+       android:layout_alignParentLeft="true"
+       android:layout_alignParentStart="true"
+       android:background="@android:color/holo_green_dark"/>
 
+  <com.fortysevendeg.swipelistview.SwipeListView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/listview"
+       android:layout_alignParentLeft="true"
+       android:layout_alignParentStart="true" />-->
 </RelativeLayout>

@@ -2,6 +2,7 @@ package com.bom.bussig.Activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.RectF;
@@ -15,17 +16,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.bom.bussig.Adapter.LineListAdapter;
-import com.bom.bussig.Data.Location.LocationService;
 import com.bom.bussig.BussigApplication;
+import com.bom.bussig.Data.Location.BussigDAL;
+import com.bom.bussig.Data.Location.LocationService;
 import com.bom.bussig.Helpers.AlphaForegroundColorSpan;
 import com.bom.bussig.Helpers.Coordinate;
 import com.bom.bussig.Helpers.StaticMap;
+import com.bom.bussig.Model.Station;
 import com.bom.bussig.R;
+import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
+import com.fortysevendeg.swipelistview.SwipeListView;
 import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
 import com.squareup.picasso.Picasso;
@@ -52,7 +59,7 @@ Yay!
  */
 public class LineListActivity extends Activity {
 
-    private ListView lineListView;
+    private SwipeListView lineListView;
     private View placeHolderView;
     private View header;
     private ImageView headerLogo;
@@ -61,20 +68,22 @@ public class LineListActivity extends Activity {
     private int mActionBarHeight;
     private AlphaForegroundColorSpan alphaForegroundColorSpan;
     private SpannableString mSpannableString;
-    private int mLocationID;
+    private Station mStation;
     private LocationService locationService;
+    private LineListAdapter lineListAdapter;
 
     private TypedValue mTypedValue = new TypedValue();
     private int actionBarTitleColor;
-
+    private Context mContext;
     private HashMap<Integer, ArrayList<RouteSegment>> groupedView = new HashMap<Integer, ArrayList<RouteSegment>>();
     ArrayList<RouteSegment> heraderp = new ArrayList<RouteSegment>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         locationService = new LocationService(this);
-
+        this.mContext = this;
         mHeaderHeight = getResources().getDimensionPixelSize(R.dimen.header_height);
         mMinHeaderTranslation = -mHeaderHeight + getActionBarHeight();
         //Eeeh...?
@@ -82,11 +91,10 @@ public class LineListActivity extends Activity {
 
         setContentView(R.layout.line_list_fancy_header);
 
-        Intent intent = getIntent();
-        this.mLocationID = intent.getIntExtra(getString(R.string.LOCATION_ID),0);
+        this.mStation = (Station)getIntent().getSerializableExtra(getString(R.string.STATION));
 
-        lineListView = (ListView) findViewById(R.id.listview);
-        lineListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        lineListView = (SwipeListView) findViewById(R.id.listview);
+        lineListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
@@ -108,6 +116,7 @@ public class LineListActivity extends Activity {
                 return true;
             }
         });
+
         header = findViewById(R.id.header);
         //headerLogo = (ImageView) findViewById(R.id.header_logo);
 
@@ -138,12 +147,12 @@ public class LineListActivity extends Activity {
 
         ResrobotClient client = new ResrobotClient("tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr", "tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr");
 
-        client.departures(this.mLocationID, 120, new ResrobotClient.DeparturesCallback() {
+        client.departures(this.mStation.getLocationID(), 120, new ResrobotClient.DeparturesCallback() {
 
             @Override
             public void departuresComplete(ArrayList<RouteSegment> result) {
                 Log.d("LineListAct", "Hamtade data bra och najs o så!");
-                LineListAdapter lineListAdapter = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, result);
+                //lineListAdapter = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, result);
                 takeEverythingAndDoItMoreBetterThanShit(result);
 
 
@@ -157,8 +166,9 @@ public class LineListActivity extends Activity {
                 }
 
                 //setListAdapter(lineListAdapter);
-                LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
-                lineListView.setAdapter(lla);
+                // TODO: mAdapter.notifyDataSetChanged(); här kanske?
+                lineListAdapter = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                lineListView.setAdapter(lineListAdapter);
             }
         });
 
@@ -214,8 +224,108 @@ public class LineListActivity extends Activity {
                     //it.remove();
                 }
 
-                LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
-                lineListView.setAdapter(lla);
+                //LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                //lineListView.setAdapter(lla);
+                lineListAdapter.notifyDataSetChanged();
+            }
+        });
+
+        lineListView.setSwipeListViewListener(new BaseSwipeListViewListener(){
+            @Override
+            public void onOpened(int position, boolean toRight) {
+            }
+
+            @Override
+            public void onClosed(int position, boolean fromRight) {
+            }
+
+            @Override
+            public void onListChanged() {
+            }
+
+            @Override
+            public void onMove(int position, float x) {
+            }
+
+            @Override
+            public void onStartOpen(int position, int action, boolean right) {
+                Log.d("swipe", String.format("onStartOpen %d - action %d", position, action));
+            }
+
+            @Override
+            public void onStartClose(int position, boolean right) {
+                Log.d("swipe", String.format("onStartClose %d", position));
+            }
+
+            @Override
+            public void onClickFrontView(int position) {
+                Log.d("swipe", String.format("onClickFrontView %d", position));
+            }
+
+
+            @Override
+            public void onChoiceChanged(int position, boolean selected) {
+                RouteSegment routesegment = (RouteSegment)lineListView.getItemAtPosition(position);
+                // Ta in linjenumret här och do magic!
+                int line = routesegment.getSegmentId().getCarrier().getNumber();
+                String direction = routesegment.getDirection();
+                int indexToBeChoosen = 0;
+                int numberOfLines = groupedView.get(line).size();
+
+                if(numberOfLines > 1) {
+                    // Hitta vart den ligger i listan, av den linjen
+                    for(int i = 0; i < numberOfLines; i++) {
+                        RouteSegment routeSegment = groupedView.get(line).get(i);
+                        if(routeSegment.getDirection().equals(direction)) {
+                            if(i == numberOfLines - 1) {
+                                // om det slår "över"
+                                indexToBeChoosen = 0;
+                            }
+                            else {
+                                // Annars är de ju bara ta nästa
+                                indexToBeChoosen = ++i;
+                            }
+                            break;
+                        }
+                    }
+                }
+                else {
+                    Log.d("LineListActivity", "Det är bara en resa från ett håll inom närmaste 120 min");
+                }
+
+
+                // Hitta vilket index i AdapterListan som den ligger på
+                // som ska ändras. Vi vill ju bevara de förra ändringarna som fanns i listan också
+                int itemToBeChanged = 0;
+                for(int i = 0; i < heraderp.size(); i++) {
+                    if(line == heraderp.get(i).getSegmentId().getCarrier().getNumber()) {
+                        itemToBeChanged = i;
+                        break;
+                    }
+                }
+
+                Iterator it = groupedView.entrySet().iterator();
+                while(it.hasNext()) {
+                    Map.Entry item = (Map.Entry)it.next();
+                    if(line == (Integer)item.getKey()) {
+                        heraderp.set(itemToBeChanged, ((ArrayList<RouteSegment>) item.getValue()).get(indexToBeChoosen));
+                    }
+                    //it.remove();
+                }
+
+                //LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                //lineListView.setAdapter(lla);
+                lineListAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onClickBackView(int position) {
+                Log.d("swipe", String.format("onClickBackView %d", position));
+            }
+
+            @Override
+            public void onDismiss(int[] reverseSortedPositions) {
+                Log.d("Swajp", "Dismiss");
             }
         });
 
@@ -293,12 +403,27 @@ public class LineListActivity extends Activity {
 
     private void setupActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setDisplayShowHomeEnabled(false);
-        actionBar.setDisplayUseLogoEnabled(false);
-        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
         View headerView = getLayoutInflater().inflate(R.layout.line_list_action_bar_layout, null);
+        ToggleButton favoriteToggle = (ToggleButton) headerView.findViewById(R.id.line_list_action_bar_favorite);
+
+        favoriteToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    new BussigDAL(mContext).addStationToFavorites(mStation);
+                    CharSequence text = mStation.toString() + " add to favorites";
+                    Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
+                } else {
+                    new BussigDAL(mContext).addStationToFavorites(mStation);
+                    CharSequence text = mStation.toString() + " removed from favorites";
+                    Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         actionBar.setCustomView(headerView);
         //actionBar.setIcon(R.drawable.logo1);
 

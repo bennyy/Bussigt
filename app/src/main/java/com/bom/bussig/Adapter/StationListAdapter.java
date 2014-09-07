@@ -13,16 +13,17 @@ import com.bom.bussig.Model.Station;
 import com.bom.bussig.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Mackan on 2014-09-06.
  */
 public class StationListAdapter extends ArrayAdapter<Station> {
     private final Context context;
-    private final ArrayList<Station> mStations;
     private final StationTranslator stationTranslator;
+    private final List<Station> mStations;
 
-    public StationListAdapter(Context context, ArrayList<Station> stations){
+    public StationListAdapter(Context context, List<Station> stations){
         super(context, R.layout.station_list_adapter, stations);
         this.context = context;
         this.stationTranslator = new StationTranslator();

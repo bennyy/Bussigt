@@ -20,12 +20,10 @@
     <string name="ResrobotStolptidsAPIKey">fpxSHgtvTNvtPvPzE1rfxt6rVBZqPzLF</string>
 
     <string name="LOCATION_ID">LOCATION_ID</string>
+    <string name="STATION">STATION</string>
     <string name="ROUTE_SEGMENT">ROUTE_SEGMENT</string>
 
-
-    <string name="Landbogatan">Lambohov</string>
-    <string name="LinkopingCentralstation">Linköping Resecentrum</string>
-    <string name="Stenaldersgatan">Skäggetorp/Vidingsjö</string>
-    <string name="Rydsvagensandhallpl.">Ryd</string>
-
+    <string name="add_to_favorite">Add to favorites</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

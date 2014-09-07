@@ -105,7 +105,7 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
                     //Convert the result to our DataModel;
                     for(int i = 0; i < locations.size() && i < BussigApplication.getContext().getResources().getInteger(R.integer.station_list_max); i++){
 
-                        mStations.add(new Station(locations.get(i).getId(), locations.get(i).getName()));
+                        mStations.add(new Station(locations.get(i).getId(), locations.get(i).getName(), locations.get(i).getLongitude(), locations.get(i).getLatitude()));
                     }
 
                     Log.d("resrobot", "fick alla stationer");
@@ -117,10 +117,10 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
 
                         @Override
                         public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                            final Station item = (Station) parent.getItemAtPosition(position);
+                            final Station station = (Station) parent.getItemAtPosition(position);
                             Intent intent = new Intent(BussigApplication.getContext(), LineListActivity.class);
 
-                            intent.putExtra(BussigApplication.getContext().getString(R.string.LOCATION_ID), item.getLocationID());
+                            intent.putExtra(BussigApplication.getContext().getString(R.string.STATION), station);
 
                             startActivity(intent);
                         }
