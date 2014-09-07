@@ -1,12 +1,14 @@
 package com.bom.bussig.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.bom.bussig.BussigApplication;
 import com.bom.bussig.Model.Departure;
 import com.bom.bussig.Model.Station;
 import com.bom.bussig.R;
@@ -34,26 +36,36 @@ public class StationListAdapter extends ArrayAdapter<Station> {
 
         setTextOnTextView(view, R.id.station_name, station.getName());
         int departureNr = 0;
-        if(station.getDepartures().size() > departureNr){
-            Departure departure = station.getDepartures().get(departureNr);
-            setTextOnTextView(view, R.id.BusNr1, Integer.toString(departure.getNumber()));
-            setTextOnTextView(view, R.id.BusDirection1, departure.getmDirection());
-            setTextOnTextView(view, R.id.BusMinutes1, Long.toString(departure.getmMinutesToNextBus()));
+        Log.d("STA",Integer.toString(station.getDepartures().size()));
+        if(station.getDepartures().size() > 0) {
+            if(station.getDepartures().size() > departureNr){
+                Departure departure = station.getDepartures().get(departureNr);
+                setTextOnTextView(view, R.id.BusNr1, Integer.toString(departure.getNumber()));
+                setTextOnTextView(view, R.id.BusDirection1, departure.getmDirection());
+                setTextOnTextView(view, R.id.BusMinutes1, Long.toString(departure.getmMinutesToNextBus()));
+            }
+            departureNr++;
+            if(station.getDepartures().size() > departureNr){
+                Departure departure = station.getDepartures().get(departureNr);
+                setTextOnTextView(view, R.id.BusNr2, Integer.toString(departure.getNumber()));
+                setTextOnTextView(view, R.id.BusDirection2, departure.getmDirection());
+                setTextOnTextView(view, R.id.BusMinutes2, Long.toString(departure.getmMinutesToNextBus()));
+            }
+            else {
+                setTextOnTextView(view, R.id.BusDirection2, ""); // Clear if there is only one
+            }
+            departureNr++;
+            if(station.getDepartures().size() > departureNr){
+                Departure departure = station.getDepartures().get(departureNr);
+                setTextOnTextView(view, R.id.BusNr3, Integer.toString(departure.getNumber()));
+                setTextOnTextView(view, R.id.BusDirection3, departure.getmDirection());
+                setTextOnTextView(view, R.id.BusMinutes3, Long.toString(departure.getmMinutesToNextBus()));
+            }
         }
-        departureNr++;
-        if(station.getDepartures().size() > departureNr){
-            Departure departure = station.getDepartures().get(departureNr);
-            setTextOnTextView(view, R.id.BusNr2, Integer.toString(departure.getNumber()));
-            setTextOnTextView(view, R.id.BusDirection2, departure.getmDirection());
-            setTextOnTextView(view, R.id.BusMinutes2, Long.toString(departure.getmMinutesToNextBus()));
+        else {
+            setTextOnTextView(view, R.id.BusDirection2, BussigApplication.getContext().getString(R.string.nothingOnTwoHours));
         }
-        departureNr++;
-        if(station.getDepartures().size() > departureNr){
-            Departure departure = station.getDepartures().get(departureNr);
-            setTextOnTextView(view, R.id.BusNr3, Integer.toString(departure.getNumber()));
-            setTextOnTextView(view, R.id.BusDirection3, departure.getmDirection());
-            setTextOnTextView(view, R.id.BusMinutes3, Long.toString(departure.getmMinutesToNextBus()));
-        }
+
         return view;
     }
 
