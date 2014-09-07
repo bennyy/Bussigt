@@ -20,15 +20,21 @@
     <string name="STATION">STATION</string>
     <string name="ROUTE_SEGMENT">ROUTE_SEGMENT</string>
 
-    <string name="add_to_favorite">Add to favorites</string>
-    <string name="remove_from_favorite_title">Remove station from favorites</string>
-    <string name="remove_from_favorite_confirm">Click ok to remove station from favorites</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
-    <string name="closest">Closest</string>
-    <string name="favorites">Favorites</string>
 
     <string name="nothingOnTwoHours"> Inga avgångar inom 2 timmar</string>
     <string name="loadingStations">Laddar...</string>
+
     <string name="min">min</string>
+
+
+    <string name="add_to_favorite">Lägg till i favoriter</string>
+    <string name="remove_from_favorite_title">Favoriter</string>
+    <string name="remove_from_favorite_confirm">Vill du ta bort stationen från favoriter </string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
+    <string name="closest">Närmaste</string>
+    <string name="favorites">Favoriter</string>
+    <string name="alarm_notification_title">Skynda!</string>
+    <string name="alarm_notification">Bussen går om %1$ minuter</string>
+
 </resources>
