@@ -6,85 +6,99 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="25dip"
+        android:layout_height="wrap_content"
         android:text="Station"
-        android:id="@+id/station_name" />
+        android:id="@+id/station_name"
+        style="@style/StationName"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/station_departure_1">
+        android:id="@+id/station_departure_1"
+        style="@style/StationDeparture">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Bussnr 1"
-            android:id="@+id/BusNr1"/>
+            android:id="@+id/BusNr1"
+            style="@style/StationListLineNumber"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BussMinutes 1"
-            android:id="@+id/BusDirection1"/>
+            android:id="@+id/BusDirection1"
+            android:textAlignment="center"
+            style="@style/StationListDirection" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BusMinutes 1"
-            android:id="@+id/BusMinutes1"/>
+            android:id="@+id/BusMinutes1"
+            style="@style/StationListMinutes" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/station_departure_2">
+        android:id="@+id/station_departure_2"
+        style="@style/StationDeparture">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Bussnr 2"
-            android:id="@+id/BusNr2"/>
+            android:id="@+id/BusNr2"
+            style="@style/StationListLineNumber"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BussMinutes 2"
-            android:id="@+id/BusDirection2"/>
+            android:id="@+id/BusDirection2"
+            style="@style/StationListDirection"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BusMinutes 2"
-            android:id="@+id/BusMinutes2"/>
+            android:id="@+id/BusMinutes2"
+            style="@style/StationListMinutes"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/station_departure_3">
+        android:id="@+id/station_departure_3"
+        style="@style/StationDeparture">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Bussnr 3"
-            android:id="@+id/BusNr3"/>
+            android:id="@+id/BusNr3"
+            style="@style/StationListLineNumber"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BussMinutes 3"
-            android:id="@+id/BusDirection3"/>
+            android:id="@+id/BusDirection3"
+            style="@style/StationListDirection"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="BusMinutes 3"
-            android:id="@+id/BusMinutes3"/>
+            android:id="@+id/BusMinutes3"
+            style="@style/StationListMinutes"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>
