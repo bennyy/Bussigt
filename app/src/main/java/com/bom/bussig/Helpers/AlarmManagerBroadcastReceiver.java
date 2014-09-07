@@ -95,7 +95,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
         intent.putExtra(ONE_TIME, Boolean.TRUE);
-        //intent.putExtra("routeSegment", routeSegment);
+        intent.putExtra("minutesToDeparture", 5);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + minutes * 1000, pi);
     }

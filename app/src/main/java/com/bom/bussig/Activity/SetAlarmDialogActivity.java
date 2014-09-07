@@ -24,7 +24,7 @@ public class SetAlarmDialogActivity extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        int minutesToDeparture = (int)getArguments().getInt("Departure");
+        final int minutesToDeparture = (int)getArguments().getInt("Departure");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Use the Builder class for convenient dialog construction
@@ -40,7 +40,7 @@ public class SetAlarmDialogActivity extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
-                        alarm.setOnetimeTimer(BussigApplication.getContext(), np.getValue());
+                        alarm.setOnetimeTimer(BussigApplication.getContext(), minutesToDeparture - np.getValue());
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

@@ -168,6 +168,6 @@ public class FavoriteStationListFragment extends Fragment implements SwipeRefres
             @Override public void run() {
                 mSwipeLayout.setRefreshing(false);
             }
-        }, 5000);
+        }, 1000);
     }
 }

@@ -38,5 +38,7 @@
     <string name="favorites">Favoriter</string>
     <string name="alarm_notification_title">Skynda!</string>
     <string name="alarm_notification">Bussen går snart</string>
+    <string name="added_to_favorites">har lagts till bland dina favoriter.</string>
+    <string name="removed_from_favorites">har tagits bort från dina favoriter.</string>
 
 </resources>
