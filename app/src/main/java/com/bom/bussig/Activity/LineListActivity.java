@@ -25,6 +25,8 @@ import com.bom.bussig.Helpers.AlphaForegroundColorSpan;
 import com.bom.bussig.Helpers.Coordinate;
 import com.bom.bussig.Helpers.StaticMap;
 import com.bom.bussig.R;
+import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
+import com.fortysevendeg.swipelistview.SwipeListView;
 import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
 import com.squareup.picasso.Picasso;
@@ -54,7 +56,7 @@ Yay!
  */
 public class LineListActivity extends Activity {
 
-    private ListView lineListView;
+    private SwipeListView lineListView;
     private View placeHolderView;
     private View header;
     private ImageView headerLogo;
@@ -73,6 +75,7 @@ public class LineListActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         mHeaderHeight = getResources().getDimensionPixelSize(R.dimen.header_height);
@@ -84,7 +87,7 @@ public class LineListActivity extends Activity {
         setContentView(R.layout.line_list_fancy_header);
 
 
-        lineListView = (ListView) findViewById(R.id.listview);
+        lineListView = (SwipeListView) findViewById(R.id.listview);
         header = findViewById(R.id.header);
         //headerLogo = (ImageView) findViewById(R.id.header_logo);
 
@@ -132,6 +135,7 @@ public class LineListActivity extends Activity {
                 }
 
                 //setListAdapter(lineListAdapter);
+                // TODO: mAdapter.notifyDataSetChanged(); här kanske?
                 LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
                 lineListView.setAdapter(lla);
             }
@@ -191,6 +195,104 @@ public class LineListActivity extends Activity {
 
                 LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
                 lineListView.setAdapter(lla);
+            }
+        });
+
+        lineListView.setSwipeListViewListener(new BaseSwipeListViewListener(){
+            @Override
+            public void onOpened(int position, boolean toRight) {
+            }
+
+            @Override
+            public void onClosed(int position, boolean fromRight) {
+            }
+
+            @Override
+            public void onListChanged() {
+            }
+
+            @Override
+            public void onMove(int position, float x) {
+            }
+
+            @Override
+            public void onStartOpen(int position, int action, boolean right) {
+                Log.d("swipe", String.format("onStartOpen %d - action %d", position, action));
+            }
+
+            @Override
+            public void onStartClose(int position, boolean right) {
+                Log.d("swipe", String.format("onStartClose %d", position));
+            }
+
+            @Override
+            public void onClickFrontView(int position) {
+                Log.d("swipe", String.format("onClickFrontView %d", position));
+            }
+
+
+            @Override
+            public void onChoiceChanged(int position, boolean selected) {
+                RouteSegment routesegment = (RouteSegment)lineListView.getItemAtPosition(position);
+                // Ta in linjenumret här och do magic!
+                int line = routesegment.getSegmentId().getCarrier().getNumber();
+                String direction = routesegment.getDirection();
+                int indexToBeChoosen = 0;
+                int numberOfLines = groupedView.get(line).size();
+
+                if(numberOfLines > 1) {
+                    // Hitta vart den ligger i listan, av den linjen
+                    for(int i = 0; i < numberOfLines; i++) {
+                        RouteSegment routeSegment = groupedView.get(line).get(i);
+                        if(routeSegment.getDirection().equals(direction)) {
+                            if(i == numberOfLines - 1) {
+                                // om det slår "över"
+                                indexToBeChoosen = 0;
+                            }
+                            else {
+                                // Annars är de ju bara ta nästa
+                                indexToBeChoosen = ++i;
+                            }
+                            break;
+                        }
+                    }
+                }
+                else {
+                    Log.d("LineListActivity", "Det är bara en resa från ett håll inom närmaste 120 min");
+                }
+
+
+                // Hitta vilket index i AdapterListan som den ligger på
+                // som ska ändras. Vi vill ju bevara de förra ändringarna som fanns i listan också
+                int itemToBeChanged = 0;
+                for(int i = 0; i < heraderp.size(); i++) {
+                    if(line == heraderp.get(i).getSegmentId().getCarrier().getNumber()) {
+                        itemToBeChanged = i;
+                        break;
+                    }
+                }
+
+                Iterator it = groupedView.entrySet().iterator();
+                while(it.hasNext()) {
+                    Map.Entry item = (Map.Entry)it.next();
+                    if(line == (Integer)item.getKey()) {
+                        heraderp.set(itemToBeChanged, ((ArrayList<RouteSegment>) item.getValue()).get(indexToBeChoosen));
+                    }
+                    //it.remove();
+                }
+
+                LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                lineListView.setAdapter(lla);
+            }
+
+            @Override
+            public void onClickBackView(int position) {
+                Log.d("swipe", String.format("onClickBackView %d", position));
+            }
+
+            @Override
+            public void onDismiss(int[] reverseSortedPositions) {
+                Log.d("Swajp", "Dismiss");
             }
         });
 

@@ -24,4 +24,18 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="ListFrontContent">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:background">@android:color/holo_blue_dark</item>
+        <item name="android:padding">2dp</item>
+    </style>
+
+    <style name="ListBackContent">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:background">@android:color/holo_green_dark</item>
+        <item name="android:gravity">center</item>
+    </style>
+
 </resources>
