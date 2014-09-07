@@ -36,6 +36,7 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         this.mContext = this;
         setContentView(R.layout.activity_station_list);
 
