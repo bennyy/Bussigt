@@ -274,11 +274,11 @@ public class LineListActivity extends Activity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     new BussigDAL(mContext).addStationToFavorites(mStation);
-                    CharSequence text = mStation.toString() + " add to favorites";
+                    CharSequence text = mStation.getName() + " add to favorites";
                     Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
                 } else {
                     new BussigDAL(mContext).removeStationFromFavorite(mStation);
-                    CharSequence text = mStation.toString() + " removed from favorites";
+                    CharSequence text = mStation.getName() + " removed from favorites";
                     Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
                 }
             }

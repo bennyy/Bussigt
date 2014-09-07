@@ -19,7 +19,7 @@ import com.mattiasbergstrom.resrobot.RouteSegment;
 
 import java.util.ArrayList;
 
-public class DepartureListActivity extends ListActivity {
+public class DepartureListActivity extends ListActivity implements SetAlarmDialogActivity.SetAlarmListener {
     DepartureListAdapter departureListAdapter;
     ResrobotClient resrobotClient;
     ArrayList<RouteSegment> currentDepartures;
@@ -39,7 +39,11 @@ public class DepartureListActivity extends ListActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final RouteSegment item = (RouteSegment) adapterView.getItemAtPosition(i);
-                alarm.setOnetimeTimer(BussigApplication.getContext(), item);
+                SetAlarmDialogActivity setAlarmDialog = new SetAlarmDialogActivity();
+                Bundle bundle = new Bundle();
+                bundle.putInt("Departure", (int)item.getDeparture().getMinutesToDeparture());
+                setAlarmDialog.setArguments(bundle);
+                setAlarmDialog.show(getFragmentManager(), "Test");
                 return true;
             }
         });
@@ -140,5 +144,13 @@ public class DepartureListActivity extends ListActivity {
         departureListAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onSetAlarm(android.app.DialogFragment dialog) {
 
+    }
+
+    @Override
+    public void onCancelSelectAlarm(android.app.DialogFragment dialog) {
+
+    }
 }

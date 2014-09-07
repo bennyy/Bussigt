@@ -83,7 +83,7 @@ public class LineListAdapter extends ArrayAdapter<RouteSegment> {
 
            relativeLayout.setBackgroundColor(context.getResources().getColor(R.color.greygrey));
             txtLineNumber.setTextColor(color);//.setBackgroundColor(color);
-            txtLineNumber.setShadowLayer(txtLineNumber.getShadowRadius(),txtLineNumber.getShadowDx(), txtLineNumber.getShadowDy(), shadowColor );
+            //txtLineNumber.setShadowLayer(txtLineNumber.getShadowRadius(),txtLineNumber.getShadowDx(), txtLineNumber.getShadowDy(), shadowColor );
             // Set line number
             txtLineNumber.setText(Integer.toString(routeSegment.getSegmentId().getCarrier().getNumber()));
 

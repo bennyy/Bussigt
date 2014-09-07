@@ -32,9 +32,11 @@
     <string name="remove_from_favorite_confirm">Vill du ta bort stationen från favoriter </string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Avbryt</string>
     <string name="closest">Närmaste</string>
     <string name="favorites">Favoriter</string>
     <string name="alarm_notification_title">Skynda!</string>
-    <string name="alarm_notification">Bussen går om %1$ minuter</string>
+    <string name="alarm_notification">Bussen går snart</string>
 
 </resources>
