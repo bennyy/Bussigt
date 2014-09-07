@@ -260,11 +260,20 @@ public class LineListActivity extends Activity {
             @Override
             public void onClickFrontView(int position) {
                 Log.d("swipe", String.format("onClickFrontView %d", position));
+
+                final RouteSegment item = (RouteSegment)lineListView.getItemAtPosition(position);
+                Intent intent = new Intent(BussigApplication.getContext(), DepartureListActivity.class);
+
+                intent.putExtra(BussigApplication.getContext().getString(R.string.ROUTE_SEGMENT), item);
+
+                startActivity(intent);
             }
 
 
             @Override
             public void onChoiceChanged(int position, boolean selected) {
+                getNextAndChangeDirection(position);
+                /*
                 RouteSegment routesegment = (RouteSegment)lineListView.getItemAtPosition(position);
                 // Ta in linjenumret här och do magic!
                 int line = routesegment.getSegmentId().getCarrier().getNumber();
@@ -315,7 +324,7 @@ public class LineListActivity extends Activity {
 
                 //LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
                 //lineListView.setAdapter(lla);
-                lineListAdapter.notifyDataSetChanged();
+                lineListAdapter.notifyDataSetChanged();*/
             }
 
             @Override
@@ -483,5 +492,59 @@ public class LineListActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void getNextAndChangeDirection(int position) {
+        RouteSegment routesegment = (RouteSegment)lineListView.getItemAtPosition(position);
+        // Ta in linjenumret här och do magic!
+        int line = routesegment.getSegmentId().getCarrier().getNumber();
+        String direction = routesegment.getDirection();
+        int indexToBeChoosen = 0;
+        int numberOfLines = groupedView.get(line).size();
+
+        if(numberOfLines > 1) {
+            // Hitta vart den ligger i listan, av den linjen
+            for(int i = 0; i < numberOfLines; i++) {
+                RouteSegment routeSegment = groupedView.get(line).get(i);
+                if(routeSegment.getDirection().equals(direction)) {
+                    if(i == numberOfLines - 1) {
+                        // om det slår "över"
+                        indexToBeChoosen = 0;
+                    }
+                    else {
+                        // Annars är de ju bara ta nästa
+                        indexToBeChoosen = ++i;
+                    }
+                    break;
+                }
+            }
+        }
+        else {
+            Log.d("LineListActivity", "Det är bara en resa från ett håll inom närmaste 120 min");
+        }
+
+
+        // Hitta vilket index i AdapterListan som den ligger på
+        // som ska ändras. Vi vill ju bevara de förra ändringarna som fanns i listan också
+        int itemToBeChanged = 0;
+        for(int i = 0; i < heraderp.size(); i++) {
+            if(line == heraderp.get(i).getSegmentId().getCarrier().getNumber()) {
+                itemToBeChanged = i;
+                break;
+            }
+        }
+
+        Iterator it = groupedView.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry item = (Map.Entry)it.next();
+            if(line == (Integer)item.getKey()) {
+                heraderp.set(itemToBeChanged, ((ArrayList<RouteSegment>) item.getValue()).get(indexToBeChoosen));
+            }
+            //it.remove();
+        }
+
+        //LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+        //lineListView.setAdapter(lla);
+        lineListAdapter.notifyDataSetChanged();
     }
 }
