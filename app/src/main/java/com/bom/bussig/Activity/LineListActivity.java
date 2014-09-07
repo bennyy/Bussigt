@@ -141,40 +141,41 @@ public class LineListActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
-                RouteSegment rs = (RouteSegment)lineListView.getItemAtPosition(position);
-                Log.d("Bus", rs.getDirection());
-
+                RouteSegment routesegment = (RouteSegment)lineListView.getItemAtPosition(position);
                 // Ta in linjenumret här och do magic!
-                int line = rs.getSegmentId().getCarrier().getNumber();
-                String direction = rs.getDirection();
-
-                int changedIndex = 0;
-                int arrayIndex = 0;
-
+                int line = routesegment.getSegmentId().getCarrier().getNumber();
+                String direction = routesegment.getDirection();
+                int indexToBeChoosen = 0;
                 int numberOfLines = groupedView.get(line).size();
+
                 if(numberOfLines > 1) {
+                    // Hitta vart den ligger i listan, av den linjen
                     for(int i = 0; i < numberOfLines; i++) {
                         RouteSegment routeSegment = groupedView.get(line).get(i);
                         if(routeSegment.getDirection().equals(direction)) {
-
-                            if(i == numberOfLines-1) {
+                            if(i == numberOfLines - 1) {
                                 // om det slår "över"
-                                changedIndex = 0;
+                                indexToBeChoosen = 0;
                             }
                             else {
                                 // Annars är de ju bara ta nästa
-                                changedIndex = ++i;
+                                indexToBeChoosen = ++i;
                             }
-                            arrayIndex = i;
                             break;
                         }
                     }
                 }
-                // Hitta vilket index skiten ligger på.. detta börjar bli sjukt invecklat :(
-                int thisToBeChanged = 0;
+                else {
+                    Log.d("LineListActivity", "Det är bara en resa från ett håll inom närmaste 120 min");
+                }
+
+
+                // Hitta vilket index i AdapterListan som den ligger på
+                // som ska ändras. Vi vill ju bevara de förra ändringarna som fanns i listan också
+                int itemToBeChanged = 0;
                 for(int i = 0; i < heraderp.size(); i++) {
                     if(line == heraderp.get(i).getSegmentId().getCarrier().getNumber()) {
-                        thisToBeChanged = i;
+                        itemToBeChanged = i;
                         break;
                     }
                 }
@@ -183,7 +184,7 @@ public class LineListActivity extends Activity {
                 while(it.hasNext()) {
                     Map.Entry item = (Map.Entry)it.next();
                     if(line == (Integer)item.getKey()) {
-                        heraderp.set(thisToBeChanged, ((ArrayList<RouteSegment>) item.getValue()).get(changedIndex));
+                        heraderp.set(itemToBeChanged, ((ArrayList<RouteSegment>) item.getValue()).get(indexToBeChoosen));
                     }
                     //it.remove();
                 }
