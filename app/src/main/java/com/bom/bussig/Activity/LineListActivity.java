@@ -246,7 +246,7 @@ public class LineListActivity extends Activity {
         ImageView headerImageView = (ImageView)findViewById(R.id.header_picture);
         headerImageView.setScaleType(ImageView.ScaleType.FIT_XY);
         android.location.Location myLocation = locationService.getLocation();
-        StaticMap headerMap = new StaticMap(myLocation, new Coordinate(15.569680,58.394281));
+        StaticMap headerMap = new StaticMap(myLocation, new Coordinate(this.mStation.getLongitude(),this.mStation.getLatitude()));
         Picasso.with(this).load(headerMap.getUrl()).into(headerImageView);
     }
 
@@ -335,9 +335,6 @@ public class LineListActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 

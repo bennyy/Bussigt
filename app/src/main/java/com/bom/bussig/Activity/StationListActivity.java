@@ -9,12 +9,15 @@ import android.location.LocationListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.bom.bussig.Adapter.SectionsPagerAdapter;
 import com.bom.bussig.Fragment.OnFragmentInteractionListener;
 import com.bom.bussig.R;
+
+
 
 
 public class StationListActivity extends Activity implements ActionBar.TabListener, LocationListener, OnFragmentInteractionListener {
@@ -29,6 +32,7 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         this.mContext = this;
         setContentView(R.layout.activity_station_list);
@@ -62,8 +66,8 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
-    }
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -72,36 +76,35 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
         return true;
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onLocationChanged(Location location) {
-
+        Log.d("Location", "location changed");
     }
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
-
+        Log.d("Location", "location status changed");
     }
 
     @Override
     public void onProviderEnabled(String s) {
-
+        Log.d("Location", "provider enabled");
     }
 
     @Override
     public void onProviderDisabled(String s) {
-
+        Log.d("Location", "provider disabled");
     }
 
     @Override
@@ -123,4 +126,5 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
     public void onFragmentInteraction(Uri uri) {
 
     }
+
 }

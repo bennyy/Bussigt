@@ -186,8 +186,10 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
 
     @Override
     public void onRefresh() {
-        mStations.clear();
-        mListAdapter.notifyDataSetChanged();
+        if (mStations != null)
+            mStations.clear();
+        if (mListAdapter != null)
+            mListAdapter.notifyDataSetChanged();
         this.updateListView();
         new Handler().postDelayed(new Runnable() {
             @Override public void run() {

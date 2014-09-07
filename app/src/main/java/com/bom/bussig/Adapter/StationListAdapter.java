@@ -1,18 +1,19 @@
 package com.bom.bussig.Adapter;
 
 import android.content.Context;
+import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.bom.bussig.Data.Location.LocationService;
 import com.bom.bussig.Helpers.StationTranslator;
 import com.bom.bussig.Model.Departure;
 import com.bom.bussig.Model.Station;
 import com.bom.bussig.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,12 +23,16 @@ public class StationListAdapter extends ArrayAdapter<Station> {
     private final Context context;
     private final StationTranslator stationTranslator;
     private final List<Station> mStations;
+    private LocationService locationService;
+    private Location currentLocation;
 
     public StationListAdapter(Context context, List<Station> stations){
         super(context, R.layout.station_list_adapter, stations);
         this.context = context;
         this.stationTranslator = new StationTranslator();
         this.mStations = stations;
+        locationService = new LocationService(context);
+        currentLocation = locationService.getLocation();
     }
 
     @Override
@@ -36,7 +41,13 @@ public class StationListAdapter extends ArrayAdapter<Station> {
         View view = inflater.inflate(R.layout.station_list_adapter, parent, false);
         Station station = mStations.get(position);
 
-        setTextOnTextView(view, R.id.station_name, station.getName());
+        Location stationLocation = new Location("gps");
+        stationLocation.setLatitude(station.getLatitude());
+        stationLocation.setLongitude(station.getLongitude());
+
+        int distance = (int)Math.round(currentLocation.distanceTo(stationLocation));
+
+        setTextOnTextView(view, R.id.station_name, station.getName() + " " + distance + "m");
         int departureNr = 0;
         if(station.getDepartures().size() > departureNr){
             Departure departure = station.getDepartures().get(departureNr);
@@ -58,6 +69,8 @@ public class StationListAdapter extends ArrayAdapter<Station> {
             setTextOnTextView(view, R.id.BusDirection3, stationTranslator.translateStation(departure.getmDirection()));
             setTextOnTextView(view, R.id.BusMinutes3, Long.toString(departure.getmMinutesToNextBus()));
         }
+
+
         return view;
     }
 

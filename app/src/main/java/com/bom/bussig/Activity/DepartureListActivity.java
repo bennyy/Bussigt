@@ -75,8 +75,6 @@ public class DepartureListActivity extends ListActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
             case R.id.action_switch_direction:
                 int directionIndex = directions.indexOf(mCurrentDirection);
                 directionIndex++;

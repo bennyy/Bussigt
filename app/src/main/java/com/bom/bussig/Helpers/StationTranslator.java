@@ -24,7 +24,11 @@ public class StationTranslator {
         translateTable.put("Linköping Centralstation", "Linköping Resecentrum");
         translateTable.put("Landbogatan", "Lambohov");
         translateTable.put("Stenåldersgatan", "Skäggetorp/Vidingsjö");
-        translateTable.put("Ryd ändhållpl.", "Ryd");
+        translateTable.put("Rydsvägens ändhållpl.", "Ryd");
+        translateTable.put("Lötgatan", "Malmslätt");
+        translateTable.put("Rydsvägens ändhållpl.", "Ryd");
+        translateTable.put("Lötgatan", "Malmslätt");
+        translateTable.put("Fönvindsvägen östra", "Tallboda");
 
     }
 
