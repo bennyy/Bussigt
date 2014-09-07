@@ -65,6 +65,7 @@ public class LineListActivity extends Activity {
     private SpannableString mSpannableString;
     private int mLocationID;
     private LocationService locationService;
+    private LineListAdapter lineListAdapter;
 
     private TypedValue mTypedValue = new TypedValue();
     private int actionBarTitleColor;
@@ -148,7 +149,7 @@ public class LineListActivity extends Activity {
             @Override
             public void departuresComplete(ArrayList<RouteSegment> result) {
                 Log.d("LineListAct", "Hamtade data bra och najs o så!");
-                LineListAdapter lineListAdapter = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, result);
+                //lineListAdapter = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, result);
                 takeEverythingAndDoItMoreBetterThanShit(result);
 
 
@@ -163,8 +164,8 @@ public class LineListActivity extends Activity {
 
                 //setListAdapter(lineListAdapter);
                 // TODO: mAdapter.notifyDataSetChanged(); här kanske?
-                LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
-                lineListView.setAdapter(lla);
+                lineListAdapter = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                lineListView.setAdapter(lineListAdapter);
             }
         });
 
@@ -220,8 +221,9 @@ public class LineListActivity extends Activity {
                     //it.remove();
                 }
 
-                LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
-                lineListView.setAdapter(lla);
+                //LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                //lineListView.setAdapter(lla);
+                lineListAdapter.notifyDataSetChanged();
             }
         });
 
@@ -308,8 +310,9 @@ public class LineListActivity extends Activity {
                     //it.remove();
                 }
 
-                LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
-                lineListView.setAdapter(lla);
+                //LineListAdapter lla = new LineListAdapter(getApplicationContext(), R.layout.activity_line_list, heraderp);
+                //lineListView.setAdapter(lla);
+                lineListAdapter.notifyDataSetChanged();
             }
 
             @Override
