@@ -63,8 +63,8 @@ public class DepartureListAdapter extends ArrayAdapter<RouteSegment> {
             //TextView directionText = (TextView) view.findViewById(R.id.direction);
             //directionText.setText(routeSegment.getDirection());
 
-            TextView directionText = (TextView) view.findViewById(R.id.direction);
-            directionText.setText(stationTranslator.translateStation(routeSegment.getDirection()));
+            //TextView directionText = (TextView) view.findViewById(R.id.direction);
+            //directionText.setText(stationTranslator.translateStation(routeSegment.getDirection()));
 
 
         }

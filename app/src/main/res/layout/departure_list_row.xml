@@ -4,20 +4,10 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/bus_number"
-        android:textSize="12sp"
-        android:textColor="@color/black"/>
-
-    <TextView
         android:id="@+id/leaving"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/departureText"
-        android:layout_below="@+id/bus_number"
-        android:textSize="12sp"
-        android:textColor="@color/black"/>
+        style="@style/departureText"/>
 
     <TextView
         android:id="@+id/timeLeft"
@@ -28,15 +18,5 @@
         android:layout_alignParentEnd="true"
         android:layout_alignBottom="@+id/leaving"
         style="@style/departureText"
-        android:layout_below="@+id/leaving"
-        android:textSize="12sp"
-        android:textColor="@color/black"/>
-
-    <TextView
-        android:id="@+id/direction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/timeLeft"
-        android:textSize="12sp"
-        android:textColor="@color/black"/>
+        android:layout_below="@+id/leaving"/>
 </RelativeLayout>
