@@ -30,4 +30,5 @@
 
     <string name="nothingOnTwoHours"> Inga avgångar inom 2 timmar</string>
     <string name="loadingStations">Laddar...</string>
+    <string name="min">min</string>
 </resources>

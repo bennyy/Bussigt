@@ -2,4 +2,20 @@
     <color name="main">#63C3FF</color>
     <color name="actionbar_title_color">@android:color/white</color>
     <color name="text_shadow">#7F000000</color>
+
+    <color name="holodBlue">#0099CC</color>
+    <color name="holodPurple">#9933CC</color>
+    <color name="holodGreen">#669900</color>
+    <color name="holodOrange">#FF8800</color>
+    <color name="holodRed">#CC0000</color>
+    <color name="fulgra">#999</color>
+
+    <color name="holoBlue">#33B5E5</color>
+    <color name="holoPurple">#AA66CC</color>
+    <color name="holoGreen">#99CC00</color>
+    <color name="holoOrange">#FFBB33</color>
+    <color name="holoRed">#FF4444</color>
+    <color name="holoGrey">#7F8888</color>
+    <color name="holodGrey">#444444</color>
+    <color name="greygrey">#fff3f3f3</color>
 </resources>

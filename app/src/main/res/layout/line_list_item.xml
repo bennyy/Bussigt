@@ -65,6 +65,17 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             style="@style/TimeLeft"/>
+
+        <TextView
+            android:id="@+id/min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/min"
+            style="@style/min"
+            android:layout_toStartOf="@+id/timeLeft"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 

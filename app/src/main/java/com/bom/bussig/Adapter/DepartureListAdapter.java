@@ -42,8 +42,8 @@ public class DepartureListAdapter extends ArrayAdapter<RouteSegment> {
 
 
             //print bus number
-            TextView busNumberText = (TextView) view.findViewById(R.id.bus_number);
-            busNumberText.setText(Integer.toString(routeSegment.getSegmentId().getCarrier().getNumber()));
+            //TextView busNumberText = (TextView) view.findViewById(R.id.bus);
+            //busNumberText.setText(Integer.toString(routeSegment.getSegmentId().getCarrier().getNumber()));
 
             //print avgångstid
             TextView leavingText = (TextView) view.findViewById(R.id.leaving);
@@ -56,8 +56,8 @@ public class DepartureListAdapter extends ArrayAdapter<RouteSegment> {
             timeLeftText.setText(Integer.toString((int)timeleft) + " minuter");
 
             //printa direction
-            TextView directionText = (TextView) view.findViewById(R.id.direction);
-            directionText.setText(routeSegment.getDirection());
+            //TextView directionText = (TextView) view.findViewById(R.id.direction);
+            //directionText.setText(routeSegment.getDirection());
 
         }
 
