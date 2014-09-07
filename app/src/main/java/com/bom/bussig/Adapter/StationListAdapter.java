@@ -52,7 +52,7 @@ public class StationListAdapter extends ArrayAdapter<Station> {
 
         int distance = (int)Math.round(currentLocation.distanceTo(stationLocation));
 
-        setTextOnTextView(view, R.id.station_name, station.getName() + " " + distance + "m");
+        setTextOnTextView(view, R.id.station_name, station.getName() + " (" + distance + "m)");
         int departureNr = 0;
 
         Log.d("STA",Integer.toString(station.getDepartures().size()));

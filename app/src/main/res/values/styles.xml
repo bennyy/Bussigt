@@ -42,30 +42,34 @@
     <style name="LineNumber">
         <item name="android:padding">5dp</item>
         <item name="android:layout_marginLeft">10dp</item>
-        <!--<item name="android:textColor">#FFFFFFFF</item>-->
+        <item name="android:textColor">#FFFFFFFF</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">30dp</item>
-        <!--<item name="android:shadowColor">@color/text_shadow</item>
+        <item name="android:textSize">40dp</item>
+        <item name="android:shadowColor">@color/text_shadow</item>
         <item name="android:shadowRadius">0.5</item>
         <item name="android:shadowDx">2</item>
-        <item name="android:shadowDy">2</item>-->
+        <item name="android:shadowDy">2</item>
     </style>
 
     <style name="Direction">
         <item name="android:padding">5dp</item>
-        <!--<item name="android:textColor">#FFFFFFFF</item>-->
+        <item name="android:textColor">@color/holodGrey</item>
         <item name="android:textSize">20dp</item>
+        <!-- <item name="android:shadowColor">@color/text_shadow</item>
+        <item name="android:shadowRadius">0.5</item>
+        <item name="android:shadowDx">2</item>
+        <item name="android:shadowDy">2</item> -->
     </style>
 
     <style name="TimeLeft">
         <item name="android:padding">5dp</item>
-        <!--<item name="android:textColor">#FFFFFFFF</item>-->
+        <item name="android:textColor">@color/holodGrey</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">40dp</item>
-        <!--<item name="android:shadowColor">@color/text_shadow</item>
+       <!-- <item name="android:shadowColor">@color/text_shadow</item>
         <item name="android:shadowRadius">0.5</item>
         <item name="android:shadowDx">2</item>
-        <item name="android:shadowDy">2</item>-->
+        <item name="android:shadowDy">2</item> -->
     </style>
 
     <style name="StationName">
@@ -90,11 +94,13 @@
         <item name="android:layout_alignParentLeft">true</item>
         <item name="android:layout_alignParentStart">true</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/holodGrey</item>
     </style>
 
     <style name="StationListDirection">
         <item name="android:layout_alignParentTop">true</item>
         <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:textColor">@color/holodGrey</item>
     </style>
 
     <style name="StationListMinutes">
@@ -102,6 +108,20 @@
         <item name="android:layout_alignParentRight">true</item>
         <item name="android:layout_alignParentEnd">true</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/holodGrey</item>
+    </style>
+
+    <style name="departureText">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">6dp</item>
+        <item name="android:textColor">@color/holodGrey</item>
+    </style>
+
+    <style name="min">
+        <item name="android:padding">5dp</item>
+        <item name="android:color">@color/holoGrey</item>
+
     </style>
 
 </resources>

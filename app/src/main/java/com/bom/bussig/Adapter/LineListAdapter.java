@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bom.bussig.Helpers.StationTranslator;
@@ -42,6 +43,47 @@ public class LineListAdapter extends ArrayAdapter<RouteSegment> {
             TextView txtDirection = (TextView) view.findViewById(R.id.direction);
             TextView txtTimeLeft = (TextView) view.findViewById(R.id.timeLeft);
 
+            int lineNumber = routeSegment.getSegmentId().getCarrier().getNumber();
+            RelativeLayout relativeLayout = (RelativeLayout)view.findViewById(R.id.front);
+
+            int color = R.color.abc_search_url_text_holo;
+            int shadowColor = context.getResources().getColor(R.color.text_shadow);
+
+            if(lineNumber == 1) {
+                color = context.getResources().getColor(R.color.holoBlue);
+                shadowColor = context.getResources().getColor(R.color.holodBlue);
+            } else if(lineNumber == 2) {
+                color = context.getResources().getColor(R.color.holoGreen);
+                shadowColor = context.getResources().getColor(R.color.holodGreen);
+            } else if(lineNumber == 3) {
+                color = context.getResources().getColor(R.color.holoRed);
+                shadowColor = context.getResources().getColor(R.color.holodRed);
+            } else if(lineNumber == 4) {
+                color = context.getResources().getColor(R.color.holoPurple);
+                shadowColor = context.getResources().getColor(R.color.holoPurple);
+            } else if(lineNumber == 10) {
+                color = context.getResources().getColor(R.color.holoOrange);
+                shadowColor = context.getResources().getColor(R.color.holodOrange);
+            } else if(lineNumber == 11) {
+                color = context.getResources().getColor(R.color.holoPurple);
+            } else if(lineNumber == 12) {
+                color = context.getResources().getColor(R.color.holodBlue);
+                shadowColor = context.getResources().getColor(R.color.holoBlue);
+            } else if(lineNumber == 13) {
+                color = context.getResources().getColor(R.color.holoGreen);
+            } else if(lineNumber == 14) {
+                color = context.getResources().getColor(R.color.holoRed);
+            } else if(lineNumber >= 15 && lineNumber <= 99) {
+                color = context.getResources().getColor(R.color.holoOrange);
+            } else if(lineNumber >= 100 && lineNumber <= 999) {
+                color = context.getResources().getColor(R.color.holoGrey);
+            } else {
+                color = context.getResources().getColor(R.color.holodGrey);
+            }
+
+           relativeLayout.setBackgroundColor(context.getResources().getColor(R.color.greygrey));
+            txtLineNumber.setTextColor(color);//.setBackgroundColor(color);
+            txtLineNumber.setShadowLayer(txtLineNumber.getShadowRadius(),txtLineNumber.getShadowDx(), txtLineNumber.getShadowDy(), shadowColor );
             // Set line number
             txtLineNumber.setText(Integer.toString(routeSegment.getSegmentId().getCarrier().getNumber()));
 

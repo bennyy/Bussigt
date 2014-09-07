@@ -24,6 +24,9 @@
     <string name="nothingOnTwoHours"> Inga avgångar inom 2 timmar</string>
     <string name="loadingStations">Laddar...</string>
 
+    <string name="min">min</string>
+
+
     <string name="add_to_favorite">Lägg till i favoriter</string>
     <string name="remove_from_favorite_title">Favoriter</string>
     <string name="remove_from_favorite_confirm">Vill du ta bort stationen från favoriter </string>
@@ -33,4 +36,5 @@
     <string name="favorites">Favoriter</string>
     <string name="alarm_notification_title">Skynda!</string>
     <string name="alarm_notification">Bussen går om %1$ minuter</string>
+
 </resources>
