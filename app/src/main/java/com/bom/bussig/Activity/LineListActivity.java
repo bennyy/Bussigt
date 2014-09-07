@@ -18,10 +18,10 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bom.bussig.Adapter.LineListAdapter;
 import com.bom.bussig.Data.Location.LocationService;
+import com.bom.bussig.BussigApplication;
 import com.bom.bussig.Helpers.AlphaForegroundColorSpan;
 import com.bom.bussig.Helpers.Coordinate;
 import com.bom.bussig.Helpers.StaticMap;
@@ -30,9 +30,6 @@ import com.mattiasbergstrom.resrobot.ResrobotClient;
 import com.mattiasbergstrom.resrobot.RouteSegment;
 import com.squareup.picasso.Picasso;
 
-import org.apache.http.impl.client.RoutedRequest;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -82,12 +79,35 @@ public class LineListActivity extends Activity {
         mMinHeaderTranslation = -mHeaderHeight + getActionBarHeight();
         //Eeeh...?
         //setContentView(R.layout.activity_noboringactionbar);
-        Intent intent = getIntent();
-        this.mLocationID = intent.getIntExtra(getString(R.string.LOCATION_ID),0);
+
         setContentView(R.layout.line_list_fancy_header);
 
+        Intent intent = getIntent();
+        this.mLocationID = intent.getIntExtra(getString(R.string.LOCATION_ID),0);
 
         lineListView = (ListView) findViewById(R.id.listview);
+        lineListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                final RouteSegment item = (RouteSegment) parent.getItemAtPosition(position);
+                Intent intent = new Intent(BussigApplication.getContext(), DepartureListActivity.class);
+
+                intent.putExtra(BussigApplication.getContext().getString(R.string.ROUTE_SEGMENT), item);
+
+                startActivity(intent);
+            }
+        });
+
+        lineListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                //((TextView) view.findViewById((R.id.bussnr))).getText();
+
+                return true;
+            }
+        });
         header = findViewById(R.id.header);
         //headerLogo = (ImageView) findViewById(R.id.header_logo);
 
@@ -273,7 +293,14 @@ public class LineListActivity extends Activity {
 
     private void setupActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setIcon(R.drawable.logo1);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayUseLogoEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayShowCustomEnabled(true);
+        View headerView = getLayoutInflater().inflate(R.layout.line_list_action_bar_layout, null);
+        actionBar.setCustomView(headerView);
+        //actionBar.setIcon(R.drawable.logo1);
 
         //getActionBarTitleView().setAlpha(0f);
     }
