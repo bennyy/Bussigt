@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.bom.bussig.Adapter.SectionsPagerAdapter;
+import com.bom.bussig.Fragment.FavoriteStationListFragment;
 import com.bom.bussig.Fragment.OnFragmentInteractionListener;
 import com.bom.bussig.R;
 
@@ -26,6 +27,7 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
     private ViewPager mViewPager;
     private Context mContext;
 
+    private FavoriteStationListFragment mFavoriteFragment;
     public Context getContext(){
         return this.mContext;
     }
@@ -124,7 +126,7 @@ public class StationListActivity extends Activity implements ActionBar.TabListen
 
     @Override
     public void onFragmentInteraction(Uri uri) {
-
+        int i = 0;
     }
 
 }

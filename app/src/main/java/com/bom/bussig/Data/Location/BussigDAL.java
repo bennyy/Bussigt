@@ -75,6 +75,24 @@ public class BussigDAL {
             close();
         }
     }
+
+    public boolean StationIsFavorite(Station station){
+        boolean isFavorite = false;
+        try{
+            open();
+            Cursor cursor = db.query(SqlLiteHelper.TABLE_FAVORITES, allColumns, SqlLiteHelper.COLUMN_LOCATION_ID + " = " + station.getLocationID(), null, null, null, null);
+            if(cursor.moveToFirst())
+                isFavorite = true;
+        }
+        catch (Exception ex){
+            Log.d("DB ERROR", "There was an error when trying to check if station is added to favorites. Exception: " + ex.toString());
+        }
+        finally {
+            close();
+        }
+        return isFavorite;
+    }
+
     public List<Station> getAllFavorites(){
 
         List<Station> stations = new ArrayList<Station>();
