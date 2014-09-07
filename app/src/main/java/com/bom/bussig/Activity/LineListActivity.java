@@ -2,6 +2,7 @@ package com.bom.bussig.Activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.RectF;
@@ -15,16 +16,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.bom.bussig.Adapter.LineListAdapter;
-import com.bom.bussig.Data.Location.LocationService;
 import com.bom.bussig.BussigApplication;
+import com.bom.bussig.Data.Location.BussigDAL;
+import com.bom.bussig.Data.Location.LocationService;
 import com.bom.bussig.Helpers.AlphaForegroundColorSpan;
 import com.bom.bussig.Helpers.Coordinate;
 import com.bom.bussig.Helpers.StaticMap;
+import com.bom.bussig.Model.Station;
 import com.bom.bussig.R;
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
@@ -63,12 +68,12 @@ public class LineListActivity extends Activity {
     private int mActionBarHeight;
     private AlphaForegroundColorSpan alphaForegroundColorSpan;
     private SpannableString mSpannableString;
-    private int mLocationID;
+    private Station mStation;
     private LocationService locationService;
 
     private TypedValue mTypedValue = new TypedValue();
     private int actionBarTitleColor;
-
+    private Context mContext;
     private HashMap<Integer, ArrayList<RouteSegment>> groupedView = new HashMap<Integer, ArrayList<RouteSegment>>();
     ArrayList<RouteSegment> heraderp = new ArrayList<RouteSegment>();
 
@@ -77,7 +82,7 @@ public class LineListActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         locationService = new LocationService(this);
-
+        this.mContext = this;
         mHeaderHeight = getResources().getDimensionPixelSize(R.dimen.header_height);
         mMinHeaderTranslation = -mHeaderHeight + getActionBarHeight();
         //Eeeh...?
@@ -85,12 +90,10 @@ public class LineListActivity extends Activity {
 
         setContentView(R.layout.line_list_fancy_header);
 
-        Intent intent = getIntent();
-        this.mLocationID = intent.getIntExtra(getString(R.string.LOCATION_ID),0);
-
+        this.mStation = (Station)getIntent().getSerializableExtra(getString(R.string.STATION));
 
         lineListView = (SwipeListView) findViewById(R.id.listview);
-        lineListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        lineListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
@@ -143,7 +146,7 @@ public class LineListActivity extends Activity {
 
         ResrobotClient client = new ResrobotClient("tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr", "tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr");
 
-        client.departures(this.mLocationID, 120, new ResrobotClient.DeparturesCallback() {
+        client.departures(this.mStation.getLocationID(), 120, new ResrobotClient.DeparturesCallback() {
 
             @Override
             public void departuresComplete(ArrayList<RouteSegment> result) {
@@ -397,12 +400,27 @@ public class LineListActivity extends Activity {
 
     private void setupActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setDisplayShowHomeEnabled(false);
-        actionBar.setDisplayUseLogoEnabled(false);
-        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
         View headerView = getLayoutInflater().inflate(R.layout.line_list_action_bar_layout, null);
+        ToggleButton favoriteToggle = (ToggleButton) headerView.findViewById(R.id.line_list_action_bar_favorite);
+
+        favoriteToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    new BussigDAL(mContext).addStationToFavorites(mStation);
+                    CharSequence text = mStation.toString() + " add to favorites";
+                    Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
+                } else {
+                    new BussigDAL(mContext).addStationToFavorites(mStation);
+                    CharSequence text = mStation.toString() + " removed from favorites";
+                    Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         actionBar.setCustomView(headerView);
         //actionBar.setIcon(R.drawable.logo1);
 

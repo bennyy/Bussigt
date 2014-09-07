@@ -3,6 +3,7 @@ package com.bom.bussig.Activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.Uri;
@@ -18,12 +19,18 @@ import com.bom.bussig.R;
 
 public class StationListActivity extends Activity implements ActionBar.TabListener, LocationListener, OnFragmentInteractionListener {
 
-    SectionsPagerAdapter mSectionsPagerAdapter;
-    ViewPager mViewPager;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private ViewPager mViewPager;
+    private Context mContext;
+
+    public Context getContext(){
+        return this.mContext;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.mContext = this;
         setContentView(R.layout.activity_station_list);
 
         final ActionBar actionBar = getActionBar();

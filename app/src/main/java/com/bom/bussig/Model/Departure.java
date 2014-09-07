@@ -1,9 +1,11 @@
 package com.bom.bussig.Model;
 
+import java.io.Serializable;
+
 /**
  * Created by Mackan on 2014-09-06.
  */
-public class Departure {
+public class Departure implements Serializable{
     private int mNumber;
     private long mMinutesToNextBus;
     private String mDirection;
