@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bom.bussig.Adapter.LineListAdapter;
+import com.bom.bussig.Data.Location.LocationService;
 import com.bom.bussig.Helpers.AlphaForegroundColorSpan;
 import com.bom.bussig.Helpers.Coordinate;
 import com.bom.bussig.Helpers.StaticMap;
@@ -56,6 +57,7 @@ public class LineListActivity extends Activity {
     private AlphaForegroundColorSpan alphaForegroundColorSpan;
     private SpannableString mSpannableString;
     private int mLocationID;
+    private LocationService locationService;
 
     private TypedValue mTypedValue = new TypedValue();
     private int actionBarTitleColor;
@@ -64,6 +66,7 @@ public class LineListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        locationService = new LocationService(this);
 
         mHeaderHeight = getResources().getDimensionPixelSize(R.dimen.header_height);
         mMinHeaderTranslation = -mHeaderHeight + getActionBarHeight();
@@ -91,6 +94,8 @@ public class LineListActivity extends Activity {
 
 
         setHeaderImage();
+
+
 
     }
 
@@ -140,15 +145,10 @@ public class LineListActivity extends Activity {
 
     private void setHeaderImage() {
         ImageView headerImageView = (ImageView)findViewById(R.id.header_picture);
-        StaticMap headerMap = new StaticMap(new Coordinate(15.560494, 58.394281), new Coordinate(15.560580, 58.394281));
-
-        Picasso.with(this).load("http://maps.googleapis.com/maps/api/staticmap?center=58.394281,15.560494&zoom=18&size=800x400&markers=color:blue%7Clabel:S%7C58.394281,15.560580&key=AIzaSyDvjJbCT-MFD3y_Wie5i7JTLZ8H5thSf8Y").into(headerImageView);
-        //headerImageView.setImageBitmap(headerMap.getImage());
-
-        Log.d("wtf", "hej");
-
-
-
+        headerImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        android.location.Location myLocation = locationService.getLocation();
+        StaticMap headerMap = new StaticMap(myLocation, new Coordinate(15.569680,58.394281));
+        Picasso.with(this).load(headerMap.getUrl()).into(headerImageView);
     }
 
     private void setTitleAlpha(float alpha) {
