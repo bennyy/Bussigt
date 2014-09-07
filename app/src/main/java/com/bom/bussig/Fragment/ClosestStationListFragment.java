@@ -60,7 +60,7 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
         }
         this.mLocationService = new LocationService(BussigApplication.getContext());
         this.mResrobotClient = new ResrobotClient(BussigApplication.getContext().getString(R.string.ResrobotAPIKey), BussigApplication.getContext().getString(R.string.ResrobotStolptidsAPIKey));
-
+        mStations = new ArrayList<Station>();
     }
 
     @Override
@@ -73,42 +73,26 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
         this.mSwipeLayout.setOnRefreshListener(this);
         this.mSwipeLayout.setColorScheme(android.R.color.darker_gray, android.R.color.black,android.R.color.darker_gray,android.R.color.black);
 
-        this.updateListView();
+        loadClosestStations(getLocation().getLongitude(), getLocation().getLatitude());
 
         return this.mView;
     }
 
-    public void updateListView(){
-        try {
-            android.location.Location location = this.mLocationService.getLocation();
-
-            if (location != null) {
-                Log.d("location", "fick location");
-
-                this.loadClosestStations(location.getLongitude(), location.getLatitude());
-
-            } else {
-                Log.d("location", "fick inte location");
-            }
-        }
-        catch (Exception e) {
-            Log.d("Location failade", e.toString());
-        }
+    public android.location.Location getLocation(){
+        return this.mLocationService.getLocation();
     }
+
     public void loadClosestStations(double longitude, double latitude){
 
         try {
             this.mResrobotClient.stationsInZone(longitude, latitude, 2000, new ResrobotClient.StationsInZoneCallback() {
                 @Override
                 public void stationsInZoneComplete(ArrayList<Location> locations) {
-                    mStations = new ArrayList<Station>();
                     //Convert the result to our DataModel;
                     for(int i = 0; i < locations.size() && i < BussigApplication.getContext().getResources().getInteger(R.integer.station_list_max); i++){
 
                         mStations.add(new Station(locations.get(i).getId(), locations.get(i).getName(), locations.get(i).getLongitude(), locations.get(i).getLatitude()));
                     }
-
-                    Log.d("resrobot", "fick alla stationer");
 
                     ListView lv = (ListView)getView().findViewById(R.id.closest_station_list_view);
                     mListAdapter = new StationListAdapter(BussigApplication.getContext(), mStations);
@@ -143,6 +127,33 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
         }
     }
 
+    public void updateClosestStations(){
+        try {
+            this.mResrobotClient.stationsInZone(getLocation().getLongitude(), getLocation().getLatitude(), 2000, new ResrobotClient.StationsInZoneCallback() {
+                @Override
+                public void stationsInZoneComplete(ArrayList<Location> locations) {
+                    //Convert the result to our DataModel;
+                    for(int i = 0; i < locations.size() && i < BussigApplication.getContext().getResources().getInteger(R.integer.station_list_max); i++){
+
+                        mStations.add(new Station(locations.get(i).getId(), locations.get(i).getName(), locations.get(i).getLongitude(), locations.get(i).getLatitude()));
+                    }
+
+                    //Load departures for each station
+                    for(int i = 0; i < mStations.size(); i++){
+                        loadDeparturesFromStation(mStations.get(i), mListAdapter );
+                    };
+                    mListAdapter.notifyDataSetChanged();
+                }
+            });
+
+
+        }
+        catch (Exception e){
+
+            Log.d("resrobot", e.toString());
+        }
+    }
+
     public void loadDeparturesFromStation(final Station station, final StationListAdapter  listAdapter){
         mResrobotClient.departures(station.getLocationID(), 120, new ResrobotClient.DeparturesCallback() {
             @Override
@@ -159,6 +170,7 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
             }
         });
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -188,12 +200,12 @@ public class ClosestStationListFragment extends Fragment implements SwipeRefresh
     public void onRefresh() {
         mStations.clear();
         mListAdapter.notifyDataSetChanged();
-        this.updateListView();
+        this.updateClosestStations();
         new Handler().postDelayed(new Runnable() {
             @Override public void run() {
                 mSwipeLayout.setRefreshing(false);
             }
-        }, 5000);
+        }, 2000);
     }
 
 

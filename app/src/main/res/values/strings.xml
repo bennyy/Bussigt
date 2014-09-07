@@ -13,9 +13,6 @@
     <string name="direction">Asdf Zxdy </string>
     <string name="timeLeft">12</string>
 
-    <string name="title_activity_station_list_favorites">Favorites</string>
-    <string name="title_activity_station_list_closest">Closest</string>
-
     <string name="ResrobotAPIKey">tAKhTKVqWF8OmVsJrJQqtlQzPQpBFTNr</string>
     <string name="ResrobotStolptidsAPIKey">fpxSHgtvTNvtPvPzE1rfxt6rVBZqPzLF</string>
 
@@ -24,6 +21,10 @@
     <string name="ROUTE_SEGMENT">ROUTE_SEGMENT</string>
 
     <string name="add_to_favorite">Add to favorites</string>
+    <string name="remove_from_favorite_title">Remove station from favorites</string>
+    <string name="remove_from_favorite_confirm">Click ok to remove station from favorites</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="closest">Closest</string>
+    <string name="favorites">Favorites</string>
 </resources>

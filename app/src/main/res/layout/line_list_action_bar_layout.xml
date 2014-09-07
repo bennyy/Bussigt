@@ -11,6 +11,9 @@
         android:text="New ToggleButton"
         android:id="@+id/line_list_action_bar_favorite"
         android:gravity="right"
-        android:layout_alignParentRight="true"/>
+        android:background="@drawable/star_toggle"
+        android:layout_alignParentRight="true"
+        android:textOff=""
+        android:textOn=""/>
 
 </RelativeLayout>

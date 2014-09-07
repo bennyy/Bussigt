@@ -269,7 +269,7 @@ public class LineListActivity extends Activity {
         actionBar.setDisplayShowCustomEnabled(true);
         View headerView = getLayoutInflater().inflate(R.layout.line_list_action_bar_layout, null);
         ToggleButton favoriteToggle = (ToggleButton) headerView.findViewById(R.id.line_list_action_bar_favorite);
-
+        favoriteToggle.setChecked((new BussigDAL(this).StationIsFavorite(mStation)));
         favoriteToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -277,7 +277,7 @@ public class LineListActivity extends Activity {
                     CharSequence text = mStation.toString() + " add to favorites";
                     Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
                 } else {
-                    new BussigDAL(mContext).addStationToFavorites(mStation);
+                    new BussigDAL(mContext).removeStationFromFavorite(mStation);
                     CharSequence text = mStation.toString() + " removed from favorites";
                     Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
                 }

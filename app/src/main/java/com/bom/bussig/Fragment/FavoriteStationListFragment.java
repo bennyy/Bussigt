@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +32,7 @@ import java.util.List;
 /**
  * Created by Mackan on 2014-09-06.
  */
-public class FavoriteStationListFragment extends Fragment {
+public class FavoriteStationListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private ResrobotClient resrobotClient;
     private LocationService mLocationService;
     private ResrobotClient mResrobotClient;
@@ -38,6 +40,8 @@ public class FavoriteStationListFragment extends Fragment {
     private List<Station> mStations;
     private StationListAdapter mListAdapter;
     private OnFragmentInteractionListener mListener;
+    private View mView;
+    private SwipeRefreshLayout mSwipeLayout;
 
     public static ClosestStationListFragment newInstance(String param1, String param2) {
         ClosestStationListFragment fragment = new ClosestStationListFragment();
@@ -63,27 +67,14 @@ public class FavoriteStationListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
-        //This might be needed in the future
-        /*try {
-            android.location.Location location = this.mLocationService.getLocation();
+        mView = inflater.inflate(R.layout.fragment_closest_station_list, container, false);
+        this.mSwipeLayout = (SwipeRefreshLayout) this.mView.findViewById(R.id.swipe_container);
+        this.mSwipeLayout.setOnRefreshListener(this);
 
-            if (location != null) {
-                Log.d("location", "fick location");
+        this.mSwipeLayout.setColorScheme(android.R.color.darker_gray, android.R.color.black,android.R.color.darker_gray,android.R.color.black);
 
-                //this.loadClosestStations(location.getLongitude(), location.getLatitude());
-
-            } else {
-                Log.d("location", "fick inte location");
-            }
-        }
-        catch (Exception e) {
-            Log.d("Location failade", e.toString());
-        }*/
-        View view = inflater.inflate(R.layout.fragment_closest_station_list, container, false);
-
-        ListView lv = (ListView)view.findViewById(R.id.closest_station_list_view);
+        ListView lv = (ListView)mView.findViewById(R.id.closest_station_list_view);
         mListAdapter = new StationListAdapter(getContext(), mStations);
         lv.setAdapter(mListAdapter);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -106,8 +97,8 @@ public class FavoriteStationListFragment extends Fragment {
 
                 new AlertDialog.Builder(getContext())
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle(R.string.add_to_favorite)
-                        .setMessage(R.string.add_to_favorite)
+                        .setTitle(R.string.remove_from_favorite_title)
+                        .setMessage(R.string.remove_from_favorite_confirm)
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 
                             @Override
@@ -126,11 +117,25 @@ public class FavoriteStationListFragment extends Fragment {
         };
         mListAdapter.notifyDataSetChanged();
 
-        return view;
+        return mView;
+    }
+
+    public void updateListView(){
+        if(mStations != null) {
+            this.mStations.addAll((new BussigDAL(((StationListActivity) getActivity()).getContext()).getAllFavorites()));
+            //Load departures for each station
+            for (int i = 0; i < mStations.size(); i++) {
+                loadDeparturesFromStation(mStations.get(i), mListAdapter);
+            }
+
+            mListAdapter.notifyDataSetChanged();
+        }
     }
 
     private void removeFromFavorites(Station station){
-
+        new BussigDAL(getContext()).removeStationFromFavorite(station);
+        mStations.remove(station);
+        mListAdapter.notifyDataSetChanged();
     }
 
     public void loadDeparturesFromStation(final Station station, final StationListAdapter listAdapter){
@@ -152,5 +157,17 @@ public class FavoriteStationListFragment extends Fragment {
 
     private Context getContext(){
         return ((StationListActivity)getActivity()).getContext();
+    }
+
+    @Override
+    public void onRefresh() {
+        mStations.clear();
+        mListAdapter.notifyDataSetChanged();
+        this.updateListView();
+        new Handler().postDelayed(new Runnable() {
+            @Override public void run() {
+                mSwipeLayout.setRefreshing(false);
+            }
+        }, 5000);
     }
 }
